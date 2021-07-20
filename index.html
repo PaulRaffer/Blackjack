@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8" />
+	</head>
+	
+	<body>
+		<div id="dealer-box" style="font-size: 64px;"></div>
+		<div id="player-boxes" style="font-size: 64px;"></div>
+
+		<script type="text/javascript" src="blackjack.js"></script>
+	
+		<input id="stake "type="number" />
+		<button onclick="placeBet()">Place Bet</button>
+		<button onclick="hit(hands[handI], remainingCards)">Hit</button>
+		<button onclick="stand()">Stand</button>
+		<button onclick="double()">Double</button>
+		<button onclick="split()">Split</button>
+		<button onclick="surrender()">Surrender</button>
+	</body>
+</html>
