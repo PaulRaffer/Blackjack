@@ -9,11 +9,11 @@
 		<div>
 			<input id="stake" type="number" />
 			<button onclick="placeBet(playerBoxes[boxI])">Place Bet</button>
-			<button onclick="hit(playerBoxes[boxI].hands[handI], remainingCards)">Hit</button>
-			<button onclick="stand()">Stand</button>
-			<button onclick="double(playerBoxes[boxI].hands[handI], remainingCards)">Double</button>
-			<button onclick="split(playerBoxes[boxI].hands[handI], playerBoxes[boxI])">Split</button>
-			<button onclick="surrender(playerBoxes[boxI].hands[handI], playerBoxes[boxI])">Surrender</button>
+			<button onclick="hit(playerBoxes[boxI].hands[handI], playerBoxes[boxI], dealerBox.hands[0], remainingCards)">Hit</button>
+			<button onclick="stand(playerBoxes[boxI].hands[handI], playerBoxes[boxI], dealerBox.hands[0], remainingCards)">Stand</button>
+			<button onclick="double(playerBoxes[boxI].hands[handI], playerBoxes[boxI], dealerBox.hands[0], remainingCards)">Double</button>
+			<button onclick="split(playerBoxes[boxI].hands[handI], playerBoxes[boxI], dealerBox.hands[0], remainingCards)">Split</button>
+			<button onclick="surrender(playerBoxes[boxI].hands[handI], playerBoxes[boxI], dealerBox.hands[0], remainingCards)">Surrender</button>
 			<button onclick="next()">Next</button>
 		</div>
 		<div id="dealer-box" style="font-size: 64px;"></div>

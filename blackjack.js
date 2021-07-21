@@ -131,7 +131,7 @@ class Card {
 	}
 }
 
-function deck()
+function freshDeck()
 {
 	var cards = [];
 	Object.values(Suit).map(suit =>
@@ -141,9 +141,9 @@ function deck()
 }
 
 
-function decks(n)
+function freshDecks(n)
 {
-	return duplicate(deck(), n);
+	return duplicate(freshDeck(), n);
 }
 
 function cardsToString(cards)
@@ -151,6 +151,15 @@ function cardsToString(cards)
 	var cardsStr = "";
 	for (card of cards) {
 		cardsStr += card.HTMLFront();
+	}
+	return cardsStr;
+}
+
+function cardsToString2(cards)
+{
+	var cardsStr = "";
+	for (card of cards) {
+		cardsStr += card.suit + card.rank + " ";
 	}
 	return cardsStr;
 }
@@ -180,14 +189,15 @@ class Player {
 }
 
 class Box {
-	constructor(player, htmlParentElement, strategy, hands = [], stake = 0)
+	constructor(player, htmlParentElement, playingStrategy, autoPlay = false, hands = [], stake = 0)
 	{
 		this.htmlElement = document.createElement("div");
 		this.infoHtmlElement = document.createElement("div");
 		
 		htmlParentElement.appendChild(this.htmlElement);
 		this.player = player;
-		this.strategy = strategy;
+		this.playingStrategy = playingStrategy;
+		this.autoPlay = autoPlay;
 		this.hands = hands;
 		this.stake = stake;
 	}
@@ -319,18 +329,18 @@ class Payouts {
 class Rules {
 	constructor(
 			payouts = new Payouts(),
-			numDecks = 6, hitsSoft17 = false,
+			numDecks = 6, deckPenetration = .75, hitsSoft17 = false,
 			canDoubleAfterSplit = true, resplitLimit = Infinity,
 			surrender = false, europeanHoleCard = true)
 	{
 		this.payouts = payouts;
 		this.numDecks = numDecks;
+		this.deckPenetration = deckPenetration;
 		this.hitsSoft17 = hitsSoft17;
 		this.canDoubleAfterSplit = canDoubleAfterSplit;
 		this.resplitLimit = resplitLimit;
 		this.surrender = surrender;
 		this.europeanHoleCard = europeanHoleCard;
-		
 	}
 }
 
@@ -384,26 +394,33 @@ function placeBet(box)
 
 
 
-function hit(hand, remainingCards)
+function hit(hand, box, dealerHand, remainingCards)
 {
 	if (phase == Phase.PLAYING && canHandHit(hand)) {
-		//confirm("Strategy Error!");
-		hand.cards.push(remainingCards.pop());
-		hand.update();
-		if (isBust(hand.cards)) {
-			next();
+		if (box.playingStrategy(hand, dealerHand) == hit || confirm(
+				  "Strategy Error!\n\n" +
+				  "Your hand: " + cardsToString2(hand.cards) + "= " + cardsValue(hand.cards) + "\n" +
+				  "Dealers hand: " + cardsToString2(dealerHand.cards) + "= " + cardsValue(dealerHand.cards) + "\n" +
+				  "Your decision: hit\n" +
+				  "Correct decision (" + box.playingStrategy.name + "): " + box.playingStrategy(hand, dealerHand).name + "\n\n" +
+				  "Do you really want to continue?")) {
+			hand.cards.push(remainingCards.pop());
+			hand.update();
+			if (isBust(hand.cards)) {
+				next();
+			}
 		}
 	}
 }
 
-function stand()
+function stand(hand, box, dealerHand, remainingCards)
 {
 	if (phase == Phase.PLAYING && canHandStand()) {
 		next();
 	}
 }
 
-function double(hand, remainingCards)
+function double(hand, box, dealerHand, remainingCards)
 {
 	if (phase == Phase.PLAYING && canHandDouble(hand)) {
 		hand.stake *= 2;
@@ -413,7 +430,7 @@ function double(hand, remainingCards)
 	}
 }
 
-function split(hand, box)
+function split(hand, box, dealerHand, remainingCards)
 {
 	if (phase == Phase.PLAYING && canHandSplit(hand)) {
 		var hand2 = new Hand([hand.cards.pop()], box.stake, ++hand.resplitCount);
@@ -422,7 +439,7 @@ function split(hand, box)
 	}
 }
 
-function surrender(hand, box)
+function surrender(hand, box, dealerHand, remainingCards)
 {
 	if (phase == Phase.PLAYING && canHandSurrender(hand)) {
 		box.player.bankroll += -0.5 * hand.stake;
@@ -469,47 +486,47 @@ const Phase = {
 
 
 
-function dealerS17Strategy(hand, dealerHand, remainingCards)
+function dealerS17Strategy(hand, dealerHand)
 {
 	if (cardsValue(hand.cards)[0] <= 16) {
-		hit(hand, remainingCards);
+		return hit;
 	}
 	else {
-		stand();
+		return stand;
 	}
 }
 
-function dealerH17Strategy(hand, dealerHand, remainingCards)
+function dealerH17Strategy(hand, dealerHand)
 {
 	if ((cardsValue(hand.cards)[0] <= 16)
 		|| (isSoft(hand.cards) && cardsValue(hand.cards)[0] == 17)) {
-		hit(hand, remainingCards);
+		return hit;
 	}
 	else {
-		stand();
+		return stand;
 	}
 }
 
-function superEasyBasicStrategy(hand, dealerHand, remainingCards)
+function superEasyBasicStrategy(hand, dealerHand)
 {
 	if ((isHard(hand.cards) && ((cardsValue(hand.cards)[0] <= 16 && cardsValue(dealerHand.cards)[0] >= 7) || cardsValue(hand.cards)[0] <= 11))
 		|| (isSoft(hand.cards) && cardsValue(hand.cards)[0] <= 17)) {
-		hit(hand, remainingCards);
+		return hit;
 	}
 	else {
-		stand();
+		return stand;
 	}
 }
 
 
 
-function noBustStrategy(hand, dealerHand, remainingCards)
+function noBustStrategy(hand, dealerHand)
 {
 	if (cardsValue(hand.cards)[0] <= 11) {
-		hit(hand, remainingCards);
+		return hit;
 	}
 	else {
-		stand();
+		return stand;
 	}
 }
 
@@ -568,7 +585,7 @@ const HiLo = new CardCountingStrategy("HiLo", {
 
 
 
-async function start()
+async function start(rules = new Rules())
 {
 	while (true) {
 		for (phase = Phase.BETTING; phase <= Phase.SHOWDOWN; phase++) {
@@ -592,9 +609,10 @@ async function start()
 					for (handI = 0; handI < box.hands.length; handI++) {
 						var hand = box.hands[handI];
 						next(false);
-						if (box.strategy) {
+						if (box.autoPlay) {
 							while(!nextFlag) {
-								box.strategy(hand, dealerBox.hands[0], remainingCards);
+								box.playingStrategy(hand, dealerBox.hands[0])
+										(hand, box, dealerBox.hands[0], remainingCards);
 							}
 						}
 						else {
@@ -622,7 +640,15 @@ async function start()
 			case Phase.PLAYING:
 				next(false);
 				while(!nextFlag) {
-					dealerBox.strategy(dealerBox.hands[0], dealerBox.hands[0], remainingCards);
+					dealerBox.playingStrategy(dealerBox.hands[0], dealerBox.hands[0])
+							(dealerBox.hands[0], dealerBox, dealerBox.hands[0], remainingCards);
+				}
+				break;
+
+			case Phase.SHOWDOWN:
+				if (remainingCards.length <= (1 - rules.deckPenetration) * 52 * rules.numDecks) {
+					remainingCards = freshDecks(rules.numDecks);
+					shuffle(remainingCards);
 				}
 				break;
 			}
@@ -638,14 +664,16 @@ var dealerBox = new Box(dealer, dealerBoxDiv, dealerS17Strategy);
 
 var playerBoxesDiv = document.getElementById('player-boxes');
 var players = [new Player(10000), new Player(10000)];
-var playerBoxes = [new Box(players[0], playerBoxesDiv), new Box(players[1], playerBoxesDiv, superEasyBasicStrategy)];
+var playerBoxes = [
+		new Box(players[0], playerBoxesDiv, noBustStrategy, true),
+		new Box(players[1], playerBoxesDiv, superEasyBasicStrategy, true)];
 
 
 var boxI = 0;
 var handI = 0;
 
 
-var remainingCards = decks(6);
+var remainingCards = freshDecks(6);
 var phase = Phase.BETTING;
 
 
@@ -654,6 +682,6 @@ var phase = Phase.BETTING;
 function main()
 {
 	shuffle(remainingCards);
-	start(handI);
+	start();
 }
 main();
