@@ -34,6 +34,11 @@ function combineElements(arrayA, arrayB, op = (a, b) => a + b)
 	return result;
 }
 
+function sleep(ms)
+{
+	return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 
 
 
@@ -165,27 +170,30 @@ class Player {
 }
 
 class Box {
-	constructor(player, htmlParentElement)
+	constructor(player, htmlParentElement, strategy)
 	{
 		this.htmlElement = document.createElement("div");
 		htmlParentElement.appendChild(this.htmlElement);
 		this.player = player;
+		this.strategy = strategy;
 	}
 }
 
 
 class Hand {
-	constructor(box, strategy, cards = [], stake = 0)
+	constructor(box, cards = [], stake = 0)
 	{
 		this.box = box;
-		this.strategy = strategy;
+		this.htmlElement = document.createElement("div");
+		this.box.htmlElement.appendChild(this.htmlElement);
 		this.cards = cards;
 		this.stake = stake;
 	}
 
 	update()
 	{
-		this.box.htmlElement.innerHTML = cardsToString(this.cards) + cardsValue(this.cards);
+		this.htmlElement.innerHTML = cardsToString(this.cards) + cardsValue(this.cards)
+				+ "; " + this.stake + ", " + this.box.player.bankroll;
 	}
 }
 
@@ -237,6 +245,13 @@ function busted(cards)
 	return cardsValue(cards).length == 0;
 }
 
+function blackjack(cards)
+{
+	return cards.length == 2 && cardsValue(cards)[0] == 21;
+}
+
+
+
 
 class Rules {
 	constructor(
@@ -254,7 +269,7 @@ class Rules {
 }
 
 
-function dealerStrategyS17(hand, dealerHand, remainingCards)
+function dealerS17Strategy(hand, dealerHand, remainingCards)
 {
 	while (cardsValue(hand.cards)[0] <= 16) {
 		hit(hand, remainingCards);
@@ -262,7 +277,7 @@ function dealerStrategyS17(hand, dealerHand, remainingCards)
 	stand();
 }
 
-function dealerStrategyH17(hand, dealerHand, remainingCards)
+function dealerH17Strategy(hand, dealerHand, remainingCards)
 {
 	while ((cardsValue(hand.cards)[0] <= 16)
 		|| (soft(hand.cards) && cardsValue(hand.cards)[0] == 17)) {
@@ -292,88 +307,247 @@ function noBustStrategy(hand, dealerHand, remainingCards)
 
 
 
-var dealerBoxDiv = document.getElementById('dealer-box');
-var dealer = new Player(1000000, true);
-var dealerBox = new Box(dealer, dealerBoxDiv);
-var dealerHand = new Hand(dealerBox, dealerStrategyS17);
+class CardCountingStrategy {
+	constructor(
+			name, cardValues,
+			bettingCorrelation, playingEfficiency, insuranceCorrelation,
+			ease, balanced, suitAware, compromiseIndexes, level)
+	{
+		this.name = name;
+		this.cardValues = cardValues;
+		this.bettingCorrelation = bettingCorrelation;
+		this.playingEfficiency = playingEfficiency;
+		this.insuranceCorrelation = insuranceCorrelation;
+		this.ease = ease;
+		this.balanced = balanced;
+		this.suitAware = suitAware;
+		this.compromiseIndexes = compromiseIndexes;
+		this.level = level;
+	}
+}
 
-var playerBoxesDiv = document.getElementById('player-boxes');
-var players = [new Player(10000), new Player(10000)];
-var playerBoxes = [new Box(players[0], playerBoxesDiv), new Box(players[1], playerBoxesDiv)];
-var playerHands = [new Hand(playerBoxes[0]), new Hand(playerBoxes[1], superEasyBasicStrategy)];
+const HiLo = new CardCountingStrategy("HiLo", {
+	'A': -1,
+	'2': +1,
+	'3': +1,
+	'4': +1,
+	'5': +1,
+	'6': +1,
+	'7':  0,
+	'8':  0,
+	'9':  0,
+	'T': -1,
+	'J': -1,
+	'Q': -1,
+	'K': -1,
+}, .97, .63, .76, 6, true, false, false, 1);
 
-var hands = playerHands.concat(dealerHand);
+
+
+
 
 const Phase = {
-	PLAYERS: 'players',
-	DEALER: 'dealer',
-}
-
-var phase = Phase.PLAYERS;
-
-var handI = 0;
-
-function deal()
-{
-	playerHands.map(hand => hand.cards = []);
-	dealerHand.cards = [];
-	playerHands.map(hand => hit(hand, remainingCards));
-	playerHands.map(hand => hit(hand, remainingCards));
-	hit(dealerHand, remainingCards);
-}
-
-function dealer(remainingCards)
-{
-	while (cardsValue(dealerHand.cards)[0] <= 16) {
-		hit(dealerHand, remainingCards);
-	}
-	stand();
-}
-
-function hit(hand, remainingCards)
-{
-	hand.cards.push(remainingCards.pop());
-
-	hand.update();
-
-	if (busted(hand.cards)) {
-		makeMove(++handI);
-	}
+	BETTING: 0,
+	DEALING: 1,
+	PLAYING: 2,
+	SHOWDOWN: 3,
 }
 
 
-function stand()
-{
-	makeMove(++handI);
-}
 
-function makeMove(handI)
-{
-	var hand = hands[handI];
 
-	if (hand.strategy) {
-		hand.strategy(hand, dealerHand, remainingCards);
-	}
-}
+
+
 
 function placeBet()
 {
-	var stake = document.getElementById("stake");
-
+	if (phase == Phase.BETTING) {
+		var stake = document.getElementById("stake").value;
+		playerHands[handI].stake = stake;
+		nextPlayerFlag = true;
+	}
 }
 
 
 
-	
 
-var playerBankroll = 10000;
+function hit(hand, remainingCards)
+{
+	if (phase == Phase.PLAYING) {
+		hand.cards.push(remainingCards.pop());
 
-	var remainingCards = decks(6);
-	shuffle(remainingCards);
+		hand.update();
 
-	while (remainingCards.length > 100) {
-		//placeBet();
-		deal();
-		makeMove(handI);
+		if (busted(hand.cards)) {
+			nextPlayerFlag = true;
+		}
 	}
+}
 
+function stand()
+{
+	if (phase == Phase.PLAYING) {
+		nextPlayerFlag = true;
+	}
+}
+
+function double()
+{
+	if (phase == Phase.PLAYING) {
+		playerHands[handI].stake *= 2;
+
+		playerHands[handI].cards.push(remainingCards.pop());
+
+		playerHands[handI].update();
+
+		nextPlayerFlag = true;
+	}
+}
+/*
+function split()
+{
+	if (phase == Phase.PLAYING) {
+		playerHands[handI].stake;
+
+		playerHands[handI].cards.push(remainingCards.pop());
+
+		new Hand(playerHands[handI].cards.pop());
+
+		playerHands[handI].update();
+
+		nextPlayerFlag = true;
+	}
+}*/
+
+function surrender()
+{
+	if (phase == Phase.PLAYING) {
+		playerHands[handI].box.player.bankroll += -0.5 * playerHands[handI].stake;
+		playerHands[handI].stake = 0;
+
+		playerHands[handI].update();
+
+		nextPlayerFlag = true;
+	}
+}
+const waitUntil = (condition) => {
+    return new Promise((resolve) => {
+        let interval = setInterval(() => {
+            if (!condition()) {
+                return
+            }
+
+            clearInterval(interval)
+            resolve()
+        }, 100)
+    })
+}
+
+var nextPlayerFlag = false;
+
+
+
+function showdown(hand)
+{
+	if (blackjack(hand.cards)) {
+		hand.box.player.bankroll += 1.5 * hand.stake;
+	}
+	else if (busted(hand.cards) || cardsValue(hand.cards)[0] < cardsValue(dealerHand.cards)[0]) {
+		hand.box.player.bankroll += -1 * hand.stake;
+	}
+	else if (cardsValue(hand.cards)[0] > cardsValue(dealerHand.cards)[0]) {
+		hand.box.player.bankroll += 1 * hand.stake;
+	}
+	hand.update();
+}
+
+
+async function start()
+{
+	while (true) {
+		for (handI = 0; handI < playerHands.length; handI++) {
+			var hand = playerHands[handI];
+
+			switch (phase) {
+			case Phase.BETTING:
+				nextPlayerFlag = false;
+				await waitUntil(() => nextPlayerFlag);
+				break;
+
+			case Phase.DEALING:
+				hand.cards = (hand.stake < 10) ? [] :
+						[remainingCards.pop(), remainingCards.pop()];
+				hand.update();
+				break;
+
+			case Phase.PLAYING:
+				if (hand.box.strategy) {
+					hand.box.strategy(hand, dealerHand, remainingCards);
+				}
+				else {
+					nextPlayerFlag = false;
+					await waitUntil(() => nextPlayerFlag);
+				}
+				break;
+
+			case Phase.SHOWDOWN:
+				showdown(hand);
+				break;
+			}
+		}
+		
+		switch (phase) {
+		case Phase.DEALING:
+			dealerHand.cards = [remainingCards.pop()];
+			dealerHand.update();
+			break;
+
+		case Phase.PLAYING:
+			dealerHand.box.strategy(dealerHand, dealerHand, remainingCards);
+			break;
+		}
+
+		if (++phase > Phase.SHOWDOWN) {
+			phase = Phase.BETTING;
+		}
+
+		console.log(phase);
+	}
+}
+
+
+
+class Table {
+
+};
+
+
+var dealerBoxDiv = document.getElementById('dealer-box');
+var dealer = new Player(1000000, true);
+var dealerBox = new Box(dealer, dealerBoxDiv, dealerS17Strategy);
+var dealerHand = new Hand(dealerBox);
+
+var playerBoxesDiv = document.getElementById('player-boxes');
+var players = [new Player(10000), new Player(10000)];
+var playerBoxes = [new Box(players[0], playerBoxesDiv), new Box(players[1], playerBoxesDiv, superEasyBasicStrategy)];
+var playerHands = [new Hand(playerBoxes[0]), new Hand(playerBoxes[1])];
+
+var hands = playerHands.concat(dealerHand);
+
+var handI = 0;
+
+
+var remainingCards = decks(6);
+var phase = Phase.BETTING;
+
+
+
+
+function main()
+{
+	shuffle(remainingCards);
+	inRound = false;
+
+	start(handI);
+}
+main();
