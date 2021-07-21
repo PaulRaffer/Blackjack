@@ -345,32 +345,48 @@ class Rules {
 }
 
 
-function canHandHit(hand, rules = new Rules())
+function canMakePlayingDecisionHit(hand, rules = new Rules())
 {
 	return true;
 }
 
-function canHandStand(hand, rules = new Rules())
+function canMakePlayingDecisionStand(hand, rules = new Rules())
 {
 	return true;
 }
 
-function canHandDouble(hand, rules = new Rules())
+function canMakePlayingDecisionDouble(hand, rules = new Rules())
 {
 	return hasHandNCards(hand, 2)
 			&& (hand.resplitCount == 0 || rules.canDoubleAfterSplit);
 }
 
-function canHandSplit(hand, rules = new Rules())
+function canMakePlayingDecisionSplit(hand, rules = new Rules())
 {
 	return hasHandNCards(hand, 2)
 			&& rankValues[hand.cards[0].rank] == rankValues[hand.cards[1].rank]
 			&& hand.resplitCount < rules.resplitLimit;
 }
 
-function canHandSurrender(hand, rules = new Rules())
+function canMakePlayingDecisionSurrender(hand, rules = new Rules())
 {
 	return isHandFresh(hand);
+}
+
+function canMakePlayingDecision(hand, decision, rules = new Rules())
+{
+	switch (decision) {
+	case hit:
+		return canMakePlayingDecisionHit(hand, rules);
+	case stand:
+		return canMakePlayingDecisionStand(hand, rules);
+	case double:
+		return canMakePlayingDecisionDouble(hand, rules);
+	case split:
+		return canMakePlayingDecisionSplit(hand, rules);
+	case surrender:
+		return canMakePlayingDecisionSurrender(hand, rules);
+	}
 }
 
 
@@ -392,37 +408,56 @@ function placeBet(box)
 }
 
 
+function confirmIncorrectPlayingDecision(hand, box, dealerHand, decision)
+{
+	return confirm(
+			"Strategy Error!\n\n" +
+			"Your hand: " + cardsToString2(hand.cards) + "= " + cardsValue(hand.cards) + "\n" +
+			"Dealers hand: " + cardsToString2(dealerHand.cards) + "= " + cardsValue(dealerHand.cards) + "\n" +
+			"Your decision: " + decision.name + "\n" +
+			"Correct decision (" + box.playingStrategy.name + "): " + box.playingStrategy(hand, dealerHand).name + "\n\n" +
+			"Do you really want to continue?");
+}
 
+function isCorrectPlayingDecision(hand, box, dealerHand, decision)
+{
+	return box.playingStrategy(hand, dealerHand) == decision;
+}
+
+function makePlayingDecision(hand, box, dealerHand, decision)
+{
+	return	phase == Phase.PLAYING &&
+			canMakePlayingDecision(hand, decision) &&
+			(isCorrectPlayingDecision(hand, box, dealerHand, decision) ||
+			confirmIncorrectPlayingDecision(hand, box, dealerHand, decision));
+}
+
+function playingDecisionHit(hand, box, remainingCards)
+{
+	hand.cards.push(remainingCards.pop());
+	hand.update();
+	if (isBust(hand.cards)) {
+		next();
+	}
+}
 
 function hit(hand, box, dealerHand, remainingCards)
 {
-	if (phase == Phase.PLAYING && canHandHit(hand)) {
-		if (box.playingStrategy(hand, dealerHand) == hit || confirm(
-				  "Strategy Error!\n\n" +
-				  "Your hand: " + cardsToString2(hand.cards) + "= " + cardsValue(hand.cards) + "\n" +
-				  "Dealers hand: " + cardsToString2(dealerHand.cards) + "= " + cardsValue(dealerHand.cards) + "\n" +
-				  "Your decision: hit\n" +
-				  "Correct decision (" + box.playingStrategy.name + "): " + box.playingStrategy(hand, dealerHand).name + "\n\n" +
-				  "Do you really want to continue?")) {
-			hand.cards.push(remainingCards.pop());
-			hand.update();
-			if (isBust(hand.cards)) {
-				next();
-			}
-		}
+	if (makePlayingDecision(hand, box, dealerHand, hit)) {
+		playingDecisionHit(hand, box, remainingCards);
 	}
 }
 
 function stand(hand, box, dealerHand, remainingCards)
 {
-	if (phase == Phase.PLAYING && canHandStand()) {
+	if (makePlayingDecision(hand, box, dealerHand, stand)) {
 		next();
 	}
 }
 
 function double(hand, box, dealerHand, remainingCards)
 {
-	if (phase == Phase.PLAYING && canHandDouble(hand)) {
+	if (makePlayingDecision(hand, box, dealerHand, double)) {
 		hand.stake *= 2;
 		hand.cards.push(remainingCards.pop());
 		hand.update();
@@ -432,7 +467,7 @@ function double(hand, box, dealerHand, remainingCards)
 
 function split(hand, box, dealerHand, remainingCards)
 {
-	if (phase == Phase.PLAYING && canHandSplit(hand)) {
+	if (makePlayingDecision(hand, box, dealerHand, split)) {
 		var hand2 = new Hand([hand.cards.pop()], box.stake, ++hand.resplitCount);
 		box.hands.push(hand2);
 		box.update();
@@ -441,7 +476,7 @@ function split(hand, box, dealerHand, remainingCards)
 
 function surrender(hand, box, dealerHand, remainingCards)
 {
-	if (phase == Phase.PLAYING && canHandSurrender(hand)) {
+	if (makePlayingDecision(hand, box, dealerHand, surrender)) {
 		box.player.bankroll += -0.5 * hand.stake;
 		hand.stake = 0;
 		box.update();
@@ -665,7 +700,7 @@ var dealerBox = new Box(dealer, dealerBoxDiv, dealerS17Strategy);
 var playerBoxesDiv = document.getElementById('player-boxes');
 var players = [new Player(10000), new Player(10000)];
 var playerBoxes = [
-		new Box(players[0], playerBoxesDiv, noBustStrategy, true),
+		new Box(players[0], playerBoxesDiv, noBustStrategy),
 		new Box(players[1], playerBoxesDiv, superEasyBasicStrategy, true)];
 
 
