@@ -421,7 +421,7 @@ function confirmIncorrectPlayingDecision(hand, box, dealerHand, decision)
 
 function isCorrectPlayingDecision(hand, box, dealerHand, decision)
 {
-	return box.playingStrategy(hand, dealerHand) == decision;
+	return box.playingStrategy ? box.playingStrategy(hand, dealerHand) == decision : true;
 }
 
 function makePlayingDecision(hand, box, dealerHand, decision)
@@ -700,7 +700,7 @@ var dealerBox = new Box(dealer, dealerBoxDiv, dealerS17Strategy);
 var playerBoxesDiv = document.getElementById('player-boxes');
 var players = [new Player(10000), new Player(10000)];
 var playerBoxes = [
-		new Box(players[0], playerBoxesDiv, noBustStrategy),
+		new Box(players[0], playerBoxesDiv),
 		new Box(players[1], playerBoxesDiv, superEasyBasicStrategy, true)];
 
 
