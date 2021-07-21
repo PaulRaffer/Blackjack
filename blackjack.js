@@ -189,15 +189,22 @@ class Player {
 }
 
 class Box {
-	constructor(player, htmlParentElement, playingStrategy, autoPlay = false, hands = [], stake = 0)
+	constructor(
+			player, htmlParentElement,
+			bettingStrategy, playingStrategy,
+			autoBet = false, autoPlay = false,
+			hands = [], stake = 0)
 	{
 		this.htmlElement = document.createElement("div");
 		this.infoHtmlElement = document.createElement("div");
 		
 		htmlParentElement.appendChild(this.htmlElement);
 		this.player = player;
+		this.bettingStrategy = bettingStrategy;
 		this.playingStrategy = playingStrategy;
+		this.autoBet = autoBet;
 		this.autoPlay = autoPlay;
+		
 		this.hands = hands;
 		this.stake = stake;
 	}
@@ -328,12 +335,13 @@ class Payouts {
 
 class Rules {
 	constructor(
-			payouts = new Payouts(),
+			payouts = new Payouts(), numRounds = Infinity,
 			numDecks = 6, deckPenetration = .75, hitsSoft17 = false,
 			canDoubleAfterSplit = true, resplitLimit = Infinity,
 			surrender = false, europeanHoleCard = true)
 	{
 		this.payouts = payouts;
+		this.numRounds = numRounds;
 		this.numDecks = numDecks;
 		this.deckPenetration = deckPenetration;
 		this.hitsSoft17 = hitsSoft17;
@@ -398,30 +406,63 @@ function next(n = true)
 }
 
 
+
+function canMakeBettingDecision(box, decision)
+{
+	return true;
+}
+
+function isCorrectBettingDecision(box, stake)
+{
+	return box.bettingStrategy ? box.bettingStrategy() == stake : true;
+}
+
+function confirmIncorrectBettingDecision(box, stake)
+{
+	return confirm(
+			"Betting Strategy Error!\n\n" +
+			
+
+			"Your stake: " + stake + "\n" +
+			"Correct stake (" + box.bettingStrategy.name + "): " + box.bettingStrategy() + "\n\n" +
+			"Do you really want to continue?");
+}
+
+function makeBettingDecision(box, stake)
+{
+	return	phase == Phase.BETTING &&
+			canMakeBettingDecision(box, stake) &&
+			(isCorrectBettingDecision(box, stake) ||
+			confirmIncorrectBettingDecision(box, stake));
+}
+
+
+
 function placeBet(box)
 {
-	if (phase == Phase.BETTING) {
-		var stake = document.getElementById("stake").value;
+	var stake = document.getElementById("stake").value;
+	if (makeBettingDecision(box, stake)) {
 		box.stake = stake;
 		next();
 	}
 }
 
 
+
+function isCorrectPlayingDecision(hand, box, dealerHand, decision)
+{
+	return box.playingStrategy ? box.playingStrategy(hand, dealerHand) == decision : true;
+}
+
 function confirmIncorrectPlayingDecision(hand, box, dealerHand, decision)
 {
 	return confirm(
-			"Strategy Error!\n\n" +
+			"Playing Strategy Error!\n\n" +
 			"Your hand: " + cardsToString2(hand.cards) + "= " + cardsValue(hand.cards) + "\n" +
 			"Dealers hand: " + cardsToString2(dealerHand.cards) + "= " + cardsValue(dealerHand.cards) + "\n" +
 			"Your decision: " + decision.name + "\n" +
 			"Correct decision (" + box.playingStrategy.name + "): " + box.playingStrategy(hand, dealerHand).name + "\n\n" +
 			"Do you really want to continue?");
-}
-
-function isCorrectPlayingDecision(hand, box, dealerHand, decision)
-{
-	return box.playingStrategy ? box.playingStrategy(hand, dealerHand) == decision : true;
 }
 
 function makePlayingDecision(hand, box, dealerHand, decision)
@@ -490,21 +531,7 @@ function surrender(hand, box, dealerHand, remainingCards)
 
 
 
-function showdown(hand, player, dealerHand, rules = new Rules())
-{
-	if (isHandNatural(hand.cards) && !isHandNatural(dealerHand.cards)) {
-		player.bankroll += hand.stake * rules.payouts.natural;
-	}
-	else if (isBust(hand.cards) || cardsValue(hand.cards)[0] < cardsValue(dealerHand.cards)[0]) {
-		player.bankroll += hand.stake * rules.payouts.loss;
-	}
-	else if (isBust(dealerHand.cards) || cardsValue(dealerHand.cards)[0] < cardsValue(hand.cards)[0]) {
-		player.bankroll += hand.stake * rules.payouts.win;
-	}
-	else {
-		player.bankroll += hand.stake * rules.payouts.push;
-	}
-}
+
 
 
 
@@ -518,6 +545,19 @@ const Phase = {
 	SHOWDOWN: 3,
 }
 
+
+function flatBettingStrategy(stake)
+{
+	function flatBettingStrategy()
+	{
+		return stake;
+	}
+	return flatBettingStrategy;
+}
+function martingaleBettingStrategy()
+{
+
+}
 
 
 
@@ -614,53 +654,84 @@ const HiLo = new CardCountingStrategy("HiLo", {
 
 
 
+async function betting(box)
+{
+	next(false);
+	if (box.autoBet && box.bettingStrategy) {
+		box.stake = box.bettingStrategy();
+	}
+	else {
+		await waitUntil(() => nextFlag);
+	}
+}
+
+function dealing(box, remainingCards)
+{
+	if (box.stake >= 10) {
+		box.hands = [new Hand([remainingCards.pop(), remainingCards.pop()], box.stake)];
+		box.update();
+	}
+}
+
+async function playing(box, dealerHand, remainingCards)
+{
+	for (handI = 0; handI < box.hands.length; handI++) {
+		var hand = box.hands[handI];
+		next(false);
+		if (box.autoPlay && box.playingStrategy) {
+			while(!nextFlag) {
+				box.playingStrategy(hand, dealerHand)
+						(hand, box, dealerHand, remainingCards);
+			}
+		}
+		else {
+			await waitUntil(() => nextFlag);
+		}
+	}
+}
 
 
+function showdown(box, dealerHand, rules = new Rules())
+{
+	for (handI = 0; handI < box.hands.length; handI++) {
+		var hand = box.hands[handI];
 
-
+		if (isHandNatural(hand.cards) && !isHandNatural(dealerHand.cards)) {
+			box.player.bankroll += hand.stake * rules.payouts.natural;
+		}
+		else if (isBust(hand.cards) || cardsValue(hand.cards)[0] < cardsValue(dealerHand.cards)[0]) {
+			box.player.bankroll += hand.stake * rules.payouts.loss;
+		}
+		else if (isBust(dealerHand.cards) || cardsValue(dealerHand.cards)[0] < cardsValue(hand.cards)[0]) {
+			box.player.bankroll += hand.stake * rules.payouts.win;
+		}
+		else {
+			box.player.bankroll += hand.stake * rules.payouts.push;
+		}
+	}
+}
 
 
 async function start(rules = new Rules())
 {
-	while (true) {
+	for (var r = 0; r < rules.numRounds; r++) {
 		for (phase = Phase.BETTING; phase <= Phase.SHOWDOWN; phase++) {
 			for (boxI = 0; boxI < playerBoxes.length; boxI++) {
 				var box = playerBoxes[boxI];
 
 				switch (phase) {
 				case Phase.BETTING:
-					next(false);
-					await waitUntil(() => nextFlag);
+					await betting(box);
 					break;
-
 				case Phase.DEALING:
-					if (box.stake >= 10) {
-						box.hands = [new Hand([remainingCards.pop(), remainingCards.pop()], box.stake)];
-						box.update();
-					}
+					dealing(box, remainingCards);
 					break;
-
 				case Phase.PLAYING:
-					for (handI = 0; handI < box.hands.length; handI++) {
-						var hand = box.hands[handI];
-						next(false);
-						if (box.autoPlay) {
-							while(!nextFlag) {
-								box.playingStrategy(hand, dealerBox.hands[0])
-										(hand, box, dealerBox.hands[0], remainingCards);
-							}
-						}
-						else {
-							await waitUntil(() => nextFlag);
-						}
-					}
+					await playing(box, dealerBox.hands[0], remainingCards);
 					break;
 
 				case Phase.SHOWDOWN:
-					for (handI = 0; handI < box.hands.length; handI++) {
-						var hand = box.hands[handI];
-						showdown(hand, box.player, dealerBox.hands[0]);
-					}
+					showdown(box, dealerBox.hands[0], rules);
 					break;
 				}
 				box.update();
@@ -695,13 +766,13 @@ async function start(rules = new Rules())
 
 var dealerBoxDiv = document.getElementById('dealer-box');
 var dealer = new Player(1000000, true);
-var dealerBox = new Box(dealer, dealerBoxDiv, dealerS17Strategy);
+var dealerBox = new Box(dealer, dealerBoxDiv, undefined, dealerS17Strategy, true, true);
 
 var playerBoxesDiv = document.getElementById('player-boxes');
 var players = [new Player(10000), new Player(10000)];
 var playerBoxes = [
-		new Box(players[0], playerBoxesDiv),
-		new Box(players[1], playerBoxesDiv, superEasyBasicStrategy, true)];
+		new Box(players[0], playerBoxesDiv, flatBettingStrategy(77), superEasyBasicStrategy, false, false),
+		new Box(players[1], playerBoxesDiv, flatBettingStrategy(77), superEasyBasicStrategy, true, true)];
 
 
 var boxI = 0;
