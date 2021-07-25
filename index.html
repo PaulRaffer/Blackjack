@@ -3,10 +3,11 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<link rel="stylesheet" type="text/css" href="./style/main.css" />
 	</head>
 	
 	<body>
-		<div>
+		<div class="input">
 			<input id="stake" type="number" />
 			<button onclick="placeBet(playerBoxes[boxI])">Place Bet</button>
 			<button onclick="hit(playerBoxes[boxI].hands[handI], playerBoxes[boxI], dealerBox.hands[0], remainingCards)">Hit</button>
@@ -16,8 +17,11 @@
 			<button onclick="surrender(playerBoxes[boxI].hands[handI], playerBoxes[boxI], dealerBox.hands[0], remainingCards)">Surrender</button>
 			<button onclick="next()">Next</button>
 		</div>
-		<div id="dealer-box" style="font-size: 64px;"></div>
-		<div id="player-boxes" style="font-size: 64px;"></div>
+
+		<dif class="table">
+			<div id="dealer-box"></div>
+			<div id="player-boxes"></div>
+		</dif>
 
 		<script type="text/javascript" src="blackjack.js"></script>
 	</body>

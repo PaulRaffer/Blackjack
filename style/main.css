@@ -1,0 +1,40 @@
+.input {
+    position: fixed;
+    bottom: 0.3em;
+    padding: 0.3em;
+}
+
+.table {
+    display: flex;
+}
+.table>* {
+    display: flex;
+}
+
+.box {
+    border: 1px solid black;
+    margin: 1em;
+}
+
+.hands {
+    display: flex;
+}
+
+.hand {
+    border: 1px solid gray;
+}
+
+.current {
+    border: 1px solid red;
+}
+
+.card {
+    font-size: 64px;
+}
+
+.♠, .♣ {
+    color: black;
+}
+.♥, .♦ {
+    color: red;
+}
