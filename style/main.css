@@ -1,35 +1,49 @@
+td {
+    vertical-align: top;
+}
+
 .input {
     position: fixed;
     bottom: 0.3em;
     padding: 0.3em;
+    flex-grow: 1;
+    display: flex;
+    width: 100%;
+    
 }
 
-.table {
+.input>div {
+    flex-grow: 1;
     display: flex;
 }
-.table>* {
-    display: flex;
+
+.input>div>* {
+    flex-grow: 1;
 }
+
+@media only screen and (min-width: 540px) {
+    .table, .table>*, .hands {
+        display: inline-flex;
+    }
+}
+
+
 
 .box {
-    border: 2px solid black;
     margin: 0.3em;
 }
 
-.properties {
-    //display: none;
-}
 
 .hands {
-    display: flex;
+    display: inline-flex;
 }
 
-.hand {
-    border: 1px solid gray;
-}
 
-.current {
-    border: 2px solid red;
+.box.current {
+    background-color: lightgreen;
+}
+.hand.current {
+    background-color: #0BDA51;
 }
 
 .card {

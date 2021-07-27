@@ -415,8 +415,7 @@ this.test = 0;
 					"<tr><td>Devisor:</td><td>"+""+"</td></tr>"+
 					"<tr><td>True Count:</td><td>"+""+"</td></tr>"+
 				"</table>";*/
-		console.log(this.test);
-		this.handsDiv.innerHTML = ""+this.autoBet;//this.player.bankroll;
+		this.handsDiv.innerHTML = "";
 		this.hands.map(hand =>
 				{
 					this.handsDiv.appendChild(hand.HTMLElement);
@@ -998,19 +997,30 @@ async function start(rules = new Rules())
 {
 	for (var r = 0; r < rules.numRounds; r++) {
 		for (phase = Phase.BETTING; phase <= Phase.SHOWDOWN; phase++) {
+
 			for (boxI = 0; boxI < playerBoxes.length; boxI++) {
 				var box = playerBoxes[boxI];
 
 				box.HTMLElement.classList.add("current");
 				switch (phase) {
 				case Phase.BETTING:
+					let inputBetting = document.getElementsByClassName("betting-input");
+					for (input of inputBetting)
+						input.disabled = false;
 					await betting(box);
+					for (input of inputBetting)
+						input.disabled = true;
 					break;
 				case Phase.DEALING:
 					dealing(box, remainingCards);
 					break;
 				case Phase.PLAYING:
+					let inputPlaying = document.getElementsByClassName("playing-input");
+					for (input of inputPlaying)
+						input.disabled = false;
 					await playing(box, dealerBox.hands[0], remainingCards);
+					for (input of inputPlaying)
+						input.disabled = true;
 					break;
 
 				case Phase.SHOWDOWN:
@@ -1121,10 +1131,35 @@ var remainingCards = freshShuffledDecks(6);
 var phase = Phase.BETTING;
 
 
+let placeBetButton = document.getElementById("placeBetButton");
+placeBetButton.onclick = () => placeBet(playerBoxes[boxI]);
 
+let hitButton = document.getElementById("hitButton");
+hitButton.onclick = () => hit(playerBoxes[boxI].hands[handI], playerBoxes[boxI], dealerBox.hands[0], remainingCards);
+
+let standButton = document.getElementById("standButton");
+standButton.onclick = () => stand(playerBoxes[boxI].hands[handI], playerBoxes[boxI], dealerBox.hands[0], remainingCards);
+
+let doubleButton = document.getElementById("doubleButton");
+doubleButton.onclick = () => double(playerBoxes[boxI].hands[handI], playerBoxes[boxI], dealerBox.hands[0], remainingCards);
+
+let splitButton = document.getElementById("splitButton");
+splitButton.onclick = () => split(playerBoxes[boxI].hands[handI], playerBoxes[boxI], dealerBox.hands[0], remainingCards);
+
+let surrenderButton = document.getElementById("surrenderButton");
+surrenderButton.onclick = () => surrender(playerBoxes[boxI].hands[handI], playerBoxes[boxI], dealerBox.hands[0], remainingCards);
+
+let nextButton = document.getElementById("nextButton");
+nextButton.onclick = next;
+
+let inputPlaying = document.getElementsByClassName("playing-input");
+for (input of inputPlaying)
+	input.disabled = true;
 
 function main()
 {
+	
+	
 	start();
 }
 main();
