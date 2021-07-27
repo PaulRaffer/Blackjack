@@ -25,7 +25,7 @@ td {
 }
 
 .input>div>span>input {
-	width: 5em;
+	width: 6em;
 }
 
 @media only screen and (min-width: 540px) {
