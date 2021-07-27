@@ -27,6 +27,11 @@ td {
     }
 }
 
+@media only screen and (max-width: 540px) {
+    :disabled {
+        display: none;
+    }
+}
 
 
 .box {
@@ -47,7 +52,7 @@ td {
 }
 
 .card {
-    font-size: 64px;
+    font-size: 6em;
 }
 
 .♠, .♣ {

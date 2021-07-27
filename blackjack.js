@@ -1118,8 +1118,8 @@ var playerBoxes = [
 				superEasyBasicStrategy, false, true,
 				HiLoCountingStrategy),
 		new Box(players[1], playerBoxesDiv,
-				flatBettingStrategy(77), true, true,
-				superEasyBasicStrategy, true, true,
+				flatBettingStrategy(77), false, false,
+				superEasyBasicStrategy, false, true,
 				HiLoCountingStrategy)];
 
 
