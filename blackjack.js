@@ -322,26 +322,6 @@ class Box {
 		this.stake = stake;
 		this.id = id;
 		
-this.test = 0;
-		
-
-		/*this.propertiesTable = document.createElement("table", { className: "properties" });
-		this.propertyHTMLElements = [];
-
-		this.propertyHTMLElements.push(document.createElement("div"));*/
-		//this.propertiesTable[0].
-
-		Object.values(this)[1] = 8;
-		//this.bettingStrategy = 8;
-
-		
-		
-
-				
-
-		
-
-		
 
 		let propertiesTable = createTable(this);
 		
@@ -376,53 +356,14 @@ this.test = 0;
 		
 	}
 
-	/*setBankroll(bankroll, event)
-	{
-		event.preventDefault();
-		//const {f} = this.state;
-		this.player.bankroll = bankroll; 
-		console.log(this.player.bankroll);
-		this.update();
-	}*/
-
 	update()
 	{
-		/*let boxPlayerBankrollInput = document.createElement("input");
-		boxPlayerBankrollInput.onChange = (event) => {
-			this.player.bankroll = Number(event.target.value);
-			//this.update();
-		};
-		boxPlayerBankrollInput.defaultValue = this.player.bankroll;*/
-
-		//this.propertiesTable.appendChild(this.propertyHTMLElements[0]);
-		//this.infoDiv.appendChild(this.propertiesTable);
-		/*this.infoDiv.innerHTML =
-				"<table class=\"properties\">"+
-					"<tr><td>Box ID:</td><td>"+this.id+"</td></tr>"+
-					//boxPlayerBankrollInput.innerHTML+
-					//"<tr><td>Bankroll:</td><td>"+moneyToString("<input type=\"number\" value=\""+this.player.bankroll+"\" onchange=\"updateBoxPlayerBankroll(this.value)\" />")+"</td></tr>"+
-					//"<tr><td>Bankroll:</td><td>"+moneyToString(boxPlayerBankrollInput)+"</td></tr>"+
-					"<tr><td>Betting Strategy:</td><td>" + (this.bettingStrategy ? this.bettingStrategy.name : "") + "</td></tr>"+
-					"<tr><td>Auto Bet:</td><td>"+this.autoBet+"</td></tr>"+
-					"<tr><td>Warn On Betting Error:</td><td>"+this.warnOnBettingError+"</td></tr>"+
-					
-					"<tr><td>Playing Strategy:</td><td>" + (this.playingStrategy ? this.playingStrategy.name : "") + "</td></tr>"+
-					"<tr><td>Auto Play:</td><td>"+this.autoPlay+"</td></tr>"+
-					"<tr><td>Warn On Playing Error:</td><td>"+this.warnOnPlayingError+"</td></tr>"+
-					
-					"<tr><td>Counting Strategy:</td><td>" + (this.countingStrategy ? this.countingStrategy.name : "") + "</td></tr>"+
-					"<tr><td>Running Count:</td><td>"+this.runningCount+"</td></tr>"+
-					"<tr><td>Devisor:</td><td>"+""+"</td></tr>"+
-					"<tr><td>True Count:</td><td>"+""+"</td></tr>"+
-				"</table>";*/
 		this.handsDiv.innerHTML = "";
 		this.hands.map(hand =>
 				{
 					this.handsDiv.appendChild(hand.HTMLElement);
 					hand.update();
 				});
-
-		
 	}
 }
 
@@ -439,10 +380,11 @@ class Hand {
 
 	update()
 	{
+		const value = cardsValue(this.cards);
 		this.HTMLElement.innerHTML =
 				cardsToString(this.cards) +
-				"<table class=\"properties\">" + 
-					"<tr><td>Value:</td><td>"+cardsValue(this.cards)+"</td></tr>"+
+				"<table class=\"properties\">"+
+					"<tr><td>Value:</td><td>"+value+ (value.every(v => v > 21) ? " (Bust)" : "") +"</td></tr>"+
 					"<tr><td>Stake:</td><td>"+moneyToString(this.stake)+"</td></tr>"+
 				"</table>";
 	}
@@ -471,11 +413,11 @@ const rankValues = {
 };
 
 
-function cardsValue(cards, max = 21)
+function cardsValue(cards)
 {
 	var value = [0];
 	for (card of cards) {
-		value = combineElements(value, rankValues[card.rank]).filter(v => v <= max);
+		value = combineElements(value, rankValues[card.rank]);
 	}
 	return [...new Set(value)];
 }
@@ -494,7 +436,7 @@ function isHard(cards)
 
 function isBust(cards)
 {
-	return cardsValue(cards).length == 0;
+	return cardsValue(cards).every(v => v > 21);
 }
 
 function hasNCards(n)
@@ -507,6 +449,12 @@ function isPair(cards)
 	return hasNCards(cards, 2) && cards[0].rank == cards[1].rank;
 }
 
+function isValueN(n)
+{
+	return cards => cardsValue(cards).filter(v => v <= 21)[0] == n;
+}
+
+const isValue21 = isValueN(21);
 
 function isHandSoft(hand)
 {
@@ -538,9 +486,14 @@ function isHandPair(hand)
 	return isPair(hand.cards);
 }
 
+function isHandValue21(hand)
+{
+	return isValue21(hand.cards);
+}
+
 function isHandNatural(hand)
 {
-	return isHandFresh(hand) && cardsValue(hand.cards)[0] == 21;
+	return isHandFresh(hand) && isHandValue21(hand);
 }
 
 
@@ -558,11 +511,12 @@ class Payouts {
 
 class Rules {
 	constructor(
-			payouts = new Payouts(), numRounds = Infinity,
+			limits = { min: 10, max: 100 }, payouts = new Payouts(), numRounds = Infinity,
 			numDecks = 6, deckPenetration = .75, hitsSoft17 = false,
 			canDoubleAfterSplit = true, resplitLimit = Infinity,
 			surrender = false, europeanHoleCard = true)
 	{
+		this.limits = limits;
 		this.payouts = payouts;
 		this.numRounds = numRounds;
 		this.numDecks = numDecks;
@@ -664,6 +618,7 @@ function makeBettingDecision(box, stake)
 
 function placeBet(box)
 {
+	console.log("placeBet");
 	var stake = document.getElementById("stake").value;
 	if (makeBettingDecision(box, stake)) {
 		box.stake = stake;
@@ -702,7 +657,7 @@ function playingDecisionHit(hand, box, remainingCards)
 {
 	hand.cards.push(drawAndCountCard(remainingCards, playerBoxes));
 	hand.update();
-	if (isBust(hand.cards)) {
+	if (isHandBust(hand)) {
 		next();
 	}
 }
@@ -736,6 +691,9 @@ function split(hand, box, dealerHand, remainingCards)
 	if (makePlayingDecision(hand, box, dealerHand, split)) {
 		var hand2 = new Hand([hand.cards.pop()], box.stake, ++hand.resplitCount);
 		box.hands.push(hand2);
+		while (hand.cards.length < 2){
+			hit(hand, box, dealerHand, remainingCards);
+		}
 		box.update();
 	}
 }
@@ -955,15 +913,18 @@ async function playing(box, dealerHand, remainingCards)
 		var hand = box.hands[handI];
 
 		hand.HTMLElement.classList.add("current");
+		while (hand.cards.length < 2){
+			hit(hand, box, dealerHand, remainingCards);
+		}
 		next(false);
 		if (box.autoPlay && box.playingStrategy) {
-			while(!nextFlag) {
+			while(!(nextFlag || isHandValue21(hand))) {
 				box.playingStrategy(hand, dealerHand)
 						(hand, box, dealerHand, remainingCards);
 			}
 		}
 		else {
-			await waitUntil(() => nextFlag);
+			await waitUntil(() => nextFlag || isHandValue21(hand));
 		}
 		hand.HTMLElement.classList.remove("current");
 	}
@@ -1004,23 +965,19 @@ async function start(rules = new Rules())
 				box.HTMLElement.classList.add("current");
 				switch (phase) {
 				case Phase.BETTING:
-					let inputBetting = document.getElementsByClassName("betting-input");
-					for (input of inputBetting)
-						input.disabled = false;
+					let bettingInput = document.getElementById("betting-input");
+					bettingInput.classList.remove("disabled");
 					await betting(box);
-					for (input of inputBetting)
-						input.disabled = true;
+					bettingInput.classList.add("disabled");
 					break;
 				case Phase.DEALING:
 					dealing(box, remainingCards);
 					break;
 				case Phase.PLAYING:
-					let inputPlaying = document.getElementsByClassName("playing-input");
-					for (input of inputPlaying)
-						input.disabled = false;
+					let playingInput = document.getElementById("playing-input");
+					playingInput.classList.remove("disabled");
 					await playing(box, dealerBox.hands[0], remainingCards);
-					for (input of inputPlaying)
-						input.disabled = true;
+					playingInput.classList.add("disabled");
 					break;
 
 				case Phase.SHOWDOWN:
@@ -1130,36 +1087,42 @@ var handI = 0;
 var remainingCards = freshShuffledDecks(6);
 var phase = Phase.BETTING;
 
+var rules = new Rules();
 
-let placeBetButton = document.getElementById("placeBetButton");
+
+let stakeInput = document.getElementById("stake");
+stakeInput.min = rules.limits.min;
+stakeInput.max = rules.limits.max;
+
+let placeBetButton = document.getElementById("place-bet-button");
 placeBetButton.onclick = () => placeBet(playerBoxes[boxI]);
 
-let hitButton = document.getElementById("hitButton");
+let hitButton = document.getElementById("hit-button");
 hitButton.onclick = () => hit(playerBoxes[boxI].hands[handI], playerBoxes[boxI], dealerBox.hands[0], remainingCards);
 
-let standButton = document.getElementById("standButton");
+let standButton = document.getElementById("stand-button");
 standButton.onclick = () => stand(playerBoxes[boxI].hands[handI], playerBoxes[boxI], dealerBox.hands[0], remainingCards);
 
-let doubleButton = document.getElementById("doubleButton");
+let doubleButton = document.getElementById("double-button");
 doubleButton.onclick = () => double(playerBoxes[boxI].hands[handI], playerBoxes[boxI], dealerBox.hands[0], remainingCards);
 
-let splitButton = document.getElementById("splitButton");
+let splitButton = document.getElementById("split-button");
 splitButton.onclick = () => split(playerBoxes[boxI].hands[handI], playerBoxes[boxI], dealerBox.hands[0], remainingCards);
 
-let surrenderButton = document.getElementById("surrenderButton");
+let surrenderButton = document.getElementById("surrender-button");
 surrenderButton.onclick = () => surrender(playerBoxes[boxI].hands[handI], playerBoxes[boxI], dealerBox.hands[0], remainingCards);
 
-let nextButton = document.getElementById("nextButton");
+let nextButton = document.getElementById("next-button");
 nextButton.onclick = next;
 
-let inputPlaying = document.getElementsByClassName("playing-input");
-for (input of inputPlaying)
-	input.disabled = true;
+
+let playingInput = document.getElementById("playing-input");
+playingInput.classList.add("disabled");
+
+
 
 function main()
 {
-	
-	
 	start();
 }
 main();

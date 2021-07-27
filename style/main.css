@@ -1,71 +1,88 @@
+body {
+	margin-bottom: 3em;
+}
+
 td {
-    vertical-align: top;
+	vertical-align: top;
 }
 
 .input {
-    position: fixed;
-    bottom: 0.3em;
-    padding: 0.3em;
-    flex-grow: 1;
-    display: flex;
-    width: 100%;
-    
+	position: fixed;
+	bottom: 0.3em;
+	padding: 0.3em;
+	flex-grow: 1;
+	display: flex;
+	width: 100%;
 }
 
-.input>div {
-    flex-grow: 1;
-    display: flex;
+.input>* {
+	flex-grow: 1;
+	display: flex;
 }
 
-.input>div>* {
-    flex-grow: 1;
+.input>div>button {
+	flex-grow: 1;
+}
+
+.input>div>span>input {
+	width: 5em;
 }
 
 @media only screen and (min-width: 540px) {
-    .table, .table>*, .hands {
-        display: inline-flex;
-    }
-}
-
-@media only screen and (max-width: 540px) {
-    :disabled {
-        display: none;
-    }
+	.table, .table>*, .hands {
+		display: inline-flex;
+	}
 }
 
 
 .box {
-    margin: 0.3em;
+	margin: 0.3em;
 }
 
 
 .hands {
-    display: inline-flex;
+	display: inline-flex;
 }
 
 
 .box.current {
-    background-color: lightgreen;
+	background-color: lightgreen;
 }
 .hand.current {
-    background-color: #0BDA51;
+	background-color: #0BDA51;
 }
 
 .card {
-    font-size: 6em;
+	font-size: 6em;
 }
 
 .♠, .♣ {
-    color: black;
+	color: black;
 }
 .♥, .♦ {
-    color: red;
+	color: red;
 }
 
 .money {
-    color: goldenrod;
+	color: goldenrod;
 }
 
 .money::after {
-    content: "$";
+	content: "$";
+}
+
+.disabled>* {
+	pointer-events:none;
+	cursor: not-allowed !important;
+	opacity: 0.5 !important;
+}
+
+@media only screen and (max-width: 540px) {
+	.disabled {
+		display: none;
+	}
+}
+
+.debug {
+	display: none;
 }
