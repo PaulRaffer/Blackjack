@@ -597,8 +597,7 @@ function canMakePlayingDecisionDouble(hand, rules = new Rules())
 
 function canMakePlayingDecisionSplit(hand, rules = new Rules())
 {
-	return hasHandNCards(2)(hand)
-			&& rankValues[hand.cards[0].rank] == rankValues[hand.cards[1].rank]
+	return isHandValuePair(hand)
 			&& hand.resplitCount < rules.resplitLimit;
 }
 
@@ -763,7 +762,10 @@ function surrender(hand, box, dealerHand, remainingCards)
 
 
 
+const surrenderHit = (hand, rules) => canMakePlayingDecisionDouble(hand, rules) ? surrender : hit;
 
+	const doubleHit = (hand, rules) => canMakePlayingDecisionDouble(hand, rules) ? double : hit;
+	const doubleStand = (hand, rules) => canMakePlayingDecisionDouble(hand, rules) ? double : stand;
 
 
 
@@ -823,7 +825,7 @@ function superEasyBasicStrategy(hand, dealerHand)
 	}
 }
 
-function basicStrategy(hand, dealerHand, rules = new Rules())
+function basicStrategySplit(hand, dealerHand, rules)
 {
 	const dealerHandValue = bestHandValue(dealerHand);
 	if (isHandValuePair(hand)) {
@@ -863,18 +865,50 @@ function basicStrategy(hand, dealerHand, rules = new Rules())
 			break;
 		}
 	}
+	return undefined;
+}
+
+
+
+function basicStrategy(hand, dealerHand, rules = new Rules())
+{
+	let decision = basicStrategySplit(hand, dealerHand, rules);
 	
 	const handValue = bestHandValue(hand);
-	if (isHandSoft(hand)) {
-		switch (handValue) {
-			
-		}
-	}
-	else if (isHandHard(hand)) {
-		
-	}
+	const dealerHandValue = bestHandValue(dealerHand);
 
-	return stand;
+	return	decision ?
+				decision :
+			isHandSoft(hand) ?
+				handValue == 20 ? stand :
+				handValue == 19 ?
+					dealerHandValue == 6 ? doubleStand(hand, rules) : stand :
+				handValue == 18 ?
+					dealerHandValue <= 6 ? doubleStand(hand, rules) :
+					dealerHandValue <= 8 ? stand : hit :
+				handValue == 17 ?
+					dealerHandValue >= 3 && dealerHandValue <= 6 ? doubleHit(hand, rules) : hit :
+				handValue <= 16 && handValue >= 15 ?
+					dealerHandValue >= 4 && dealerHandValue <= 6 ? doubleHit(hand, rules) : hit :
+				handValue <= 14 && handValue >= 13 ?
+					dealerHandValue >= 5 && dealerHandValue <= 6 ? doubleHit(hand, rules) : hit :
+				undefined :
+			isHandHard(hand) ?
+				handValue == 16 && dealerHandValue >= 9 && dealerHandValue <= 11 ? surrenderHit(hand, rules) :
+				handValue == 15 && dealerHandValue == 10 ? surrenderHit(hand, rules) :
+				handValue >= 17 ? stand :
+				handValue <= 16 && handValue >= 13 ?
+					dealerHandValue <= 6 ? stand : hit :
+				handValue == 12 ?
+					dealerHandValue >= 4 && dealerHandValue <= 6 ? stand : hit :
+				handValue == 11 ? doubleHit(hand, rules) :
+				handValue == 10 ?
+					dealerHandValue <= 9 ? doubleHit(hand, rules) : hit :
+				handValue == 9 ?
+					dealerHandValue >= 3 && dealerHandValue <= 6 ? doubleHit(hand, rules) : hit :
+				handValue <= 8 ? hit :
+				undefined :
+			undefined;
 }
 
 
