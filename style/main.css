@@ -12,8 +12,12 @@
 }
 
 .box {
-    border: 1px solid black;
-    margin: 1em;
+    border: 2px solid black;
+    margin: 0.3em;
+}
+
+.properties {
+    //display: none;
 }
 
 .hands {
@@ -25,7 +29,7 @@
 }
 
 .current {
-    border: 1px solid red;
+    border: 2px solid red;
 }
 
 .card {
@@ -37,4 +41,12 @@
 }
 .♥, .♦ {
     color: red;
+}
+
+.money {
+    color: goldenrod;
+}
+
+.money::after {
+    content: "$";
 }

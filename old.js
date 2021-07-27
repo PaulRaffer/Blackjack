@@ -175,6 +175,9 @@ const PlayerDecision = {
 	SURRENDER: 'R',
 }
 
+for (a of Object.values(PlayerDecision)) {
+	console.log(a);
+}
 
 
 
@@ -192,6 +195,7 @@ function moneyToString(money)
 
 function toggleBoxInfo(element)
 {
+	console.log("!");
 	//let HTMLElement = document.getElementById("box"+id+"-info");
 	element.style.display =
 			element.style.display == "none" ||
@@ -211,55 +215,15 @@ function updateBoxPlayerBankroll(boxId, bankroll)
 	bankroll;
 }
 
-function typeToInputType(type)
+function createTable(object)
 {
-	switch (type) {
-	case "boolean":
-		return "checkbox";
-	default:
-		return type;
-	}
-}
-
-
-function getInputValue(input)
-{
-	if (input.type == "checkbox") {
-		return input.checked;
-	}
-	else if (input.type == "number") {
-		return input.value;
-	}
-	else {
-		return input.value;
-	}
-}
-
-function setInputValue(input, value)
-{
-	if (input.type == "checkbox") {
-		input.checked = value;
-	}
-	else {
-		input.value = value;
-	}
-}
-
-var createTableCount = 0;
-function createTable(object, editable = false, displayIcons = { "none": ">", "block": "v" })
-{
-	let div = document.createElement("div");
-
 	let propertiesTable = document.createElement("table");
 	propertiesTable.className = "properties";
-	for (let p in object)
+	for (let p in object)//Object.entries(this).forEach(([key, value]) =>
 	{
 		let propertyTR = document.createElement("tr");
 		let propertyTD1 = document.createElement("td");
-		let propertyName = document.createElement("label");
-		propertyName.htmlFor = "table"+createTableCount+"-"+p+"-input";
-		propertyName.innerHTML = p+":";
-		propertyTD1.appendChild(propertyName);
+		propertyTD1.innerHTML = p+":";
 
 		let propertyTD2 = document.createElement("td");
 		let propertyValue = null;
@@ -268,35 +232,19 @@ function createTable(object, editable = false, displayIcons = { "none": ">", "bl
 		}
 		else {
 			propertyValue = document.createElement("input");
-			propertyValue.id = "table"+createTableCount+"-"+p+"-input";
-			propertyValue.className = p+"-input";
-			propertyValue.type = typeToInputType(typeof object[p]);
-			setInputValue(propertyValue, object[p]);
-			propertyValue.onchange = event => object[p] = getInputValue(propertyValue);
+			propertyValue.type = "number";
+			propertyValue.value = object[p]; // !
+		
+			propertyValue.onchange = event => object[p] = Number(event.target.value);
+			//propertiesTableCol2.
 		}	
 		propertyTD2.appendChild(propertyValue);
 		propertyTR.appendChild(propertyTD1);
 		propertyTR.appendChild(propertyTD2);
 		propertiesTable.appendChild(propertyTR);
+		
 	}
-
-	let toggleBoxInfoButton = document.createElement("button");
-	toggleBoxInfoButton.className = "toggle";
-	toggleBoxInfoButton.onclick = () =>
-			{
-				propertiesTable.style.display =
-						propertiesTable.style.display == "none" ?
-								"block" : "none";
-				toggleBoxInfoButton.innerText = displayIcons[propertiesTable.style.display];
-			};
-	propertiesTable.style.display = "none";
-	toggleBoxInfoButton.innerText = displayIcons[propertiesTable.style.display];
-
-	div.appendChild(toggleBoxInfoButton);
-	div.appendChild(propertiesTable);
-
-	createTableCount++;
-	return div;
+	return propertiesTable;
 }
 
 class Box {
@@ -359,7 +307,10 @@ this.test = 0;
 		this.handsDiv.className = "hands";
 
 
-		
+		let toggleBoxInfoButton = document.createElement("button");
+		toggleBoxInfoButton.className = "toggle";
+		toggleBoxInfoButton.onclick = () => toggleBoxInfo(this.infoDiv);
+		toggleBoxInfoButton.innerHTML = "⚙";
 
 
 		this.HTMLElement = document.createElement("div");
@@ -368,6 +319,7 @@ this.test = 0;
 
 		this.HTMLElement.innerHTML = "";
 		this.HTMLElement.appendChild(this.handsDiv);
+		this.HTMLElement.appendChild(toggleBoxInfoButton);
 		this.HTMLElement.appendChild(this.infoDiv);
 
 
@@ -416,7 +368,7 @@ this.test = 0;
 					"<tr><td>True Count:</td><td>"+""+"</td></tr>"+
 				"</table>";*/
 		console.log(this.test);
-		this.handsDiv.innerHTML = ""+this.autoBet;//this.player.bankroll;
+		this.handsDiv.innerHTML = ""+this.player.bankroll;
 		this.hands.map(hand =>
 				{
 					this.handsDiv.appendChild(hand.HTMLElement);

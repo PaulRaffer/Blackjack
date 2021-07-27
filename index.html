@@ -8,7 +8,7 @@
 	
 	<body>
 		<div class="input">
-			<input id="stake" type="number" />
+			<span class="money"><input id="stake" type="number" /></span>
 			<button onclick="placeBet(playerBoxes[boxI])">Place Bet</button>
 			<button onclick="hit(playerBoxes[boxI].hands[handI], playerBoxes[boxI], dealerBox.hands[0], remainingCards)">Hit</button>
 			<button onclick="stand(playerBoxes[boxI].hands[handI], playerBoxes[boxI], dealerBox.hands[0], remainingCards)">Stand</button>
@@ -18,10 +18,10 @@
 			<button onclick="next()">Next</button>
 		</div>
 
-		<dif class="table">
+		<div class="table">
 			<div id="dealer-box"></div>
 			<div id="player-boxes"></div>
-		</dif>
+		</div>
 
 		<script type="text/javascript" src="blackjack.js"></script>
 	</body>
