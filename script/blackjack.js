@@ -57,7 +57,10 @@ class Box {
 		this.id = id;
 		
 
-		let propertiesTable = createTable(this);
+		let propertiesTable = createTable(this, {
+				bettingStrategy: [flatBettingStrategy(10).name],
+				playingStrategy: [basicStrategy.name, superEasyBasicStrategy.name, dealerS17Strategy.name, dealerH17Strategy.name],
+				countingStrategy: [hiLoCountingStrategy.name, koCountingStrategy.name]});
 		
 
 
@@ -725,8 +728,55 @@ const HiLo = new CardCountingStrategy("HiLo", {
 */
 
 
+function countCard(card, boxes)
+{
+	boxes.map(box =>
+			{
+				if (box.countingStrategy)
+					box.runningCount += box.countingStrategy(card);
+				box.update();
+			});
+}
+
+function drawAndCountCard(cards, boxes)
+{
+	const card = drawCard(cards);
+	countCard(card, boxes);
+	return card;
+}
+
+function hiLoCountingStrategy(card)
+{
+	const value = rankValues[card.rank][0];
+	return	value <=  6 ? +1 :
+			value >= 10 ? -1 :
+			0;
+}
+
+function koCountingStrategy(card)
+{
+	const value = rankValues[card.rank][0];
+	return	value <=  7 ? +1 :
+			value >= 10 ? -1 :
+			0;
+}
 
 
+
+
+function trueCountConversion(runningCount, numRemainingCards)
+{
+	const remainingDecks = numRemainingCards / 52;
+	const trueCount = runningCount / remainingDecks;
+	return trueCount;
+}
+
+
+
+function resetRunningCounts(boxes)
+{
+	boxes.forEach(box => box.runningCount = 0);
+}
 
 
 
@@ -852,9 +902,9 @@ async function start(table)
 			case Phase.SHOWDOWN:
 				if (remainingCards.length <= (1 - table.rules.deckPenetration) * 52 * table.rules.numDecks) {
 					remainingCards = freshShuffledDecks(table.rules.numDecks);
-					//resetRunningCounts(boxes);
+					resetRunningCounts(playerBoxes);
 				}
-				await sleep(50);
+				await sleep(100);
 				break;
 			}
 			dealerBox.HTMLElement.classList.remove("current");
@@ -862,57 +912,13 @@ async function start(table)
 	}
 }
 
-function freshShuffledDecks(n)
-{
-	let decks = freshDecks(n);
-	shuffle(decks);
-	return decks;
-}
 
-function drawCard(cards)
-{
-	return cards.pop();
-}
-
-function countCard(card, boxes)
-{
-	boxes.map(box =>
-			{
-				if (box.countingStrategy)
-					box.runningCount += box.countingStrategy(card);
-				box.update();
-			});
-}
-
-function drawAndCountCard(cards, boxes)
-{
-	const card = drawCard(cards);
-	countCard(card, boxes);
-	return card;
-}
-
-
-
-function hiLoCountingStrategy(card)
-{
-	const value = rankValues[card.rank][0];
-	return	value <=  6 ? +1 :
-			value >= 10 ? -1 :
-			0;
-}
-
-function trueCountConversion(runningCount, numRemainingCards)
-{
-	const remainingDecks = numRemainingCards / 52;
-	const trueCount = runningCount / remainingDecks;
-	return trueCount;
-}
 
 
 var dealerBoxDiv = document.getElementById('dealer-box');
 var dealer = new Player(0);
 var dealerBox = new Box(dealer, dealerBoxDiv,
-		undefined, true, false,
+		undefined, false, false,
 		dealerS17Strategy, true, false);
 
 var playerBoxesDiv = document.getElementById('player-boxes');
@@ -986,7 +992,11 @@ let addPlayerBoxButton = document.getElementById("add-player-box-button");
 addPlayerBoxButton.onclick = () =>
 		{
 			let player = new Player(10000);
-			playerBoxes.push(new Box(player, playerBoxesDiv));
+			playerBoxes.push(
+					new Box(player, playerBoxesDiv,
+							flatBettingStrategy(10), false, false,
+							basicStrategy, false, true,
+							hiLoCountingStrategy));
 		}
 
 let tableSettings = createTable(table);

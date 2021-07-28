@@ -86,11 +86,23 @@ function freshDeck()
 	return cards;
 }
 
-
 function freshDecks(n)
 {
 	return duplicate(freshDeck(), n);
 }
+
+function freshShuffledDecks(n)
+{
+	let decks = freshDecks(n);
+	shuffle(decks);
+	return decks;
+}
+
+function drawCard(cards)
+{
+	return cards.pop();
+}
+
 
 function cardsToString(cards)
 {

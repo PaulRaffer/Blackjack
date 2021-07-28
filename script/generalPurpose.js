@@ -32,16 +32,16 @@ function combineElements(arrayA, arrayB, op = (a, b) => a + b)
 
 
 const waitUntil = (condition) => {
-    return new Promise((resolve) => {
-        let interval = setInterval(() => {
-            if (!condition()) {
-                return
-            }
+	return new Promise((resolve) => {
+		let interval = setInterval(() => {
+			if (!condition()) {
+				return
+			}
 
-            clearInterval(interval)
-            resolve()
-        }, 100)
-    })
+			clearInterval(interval)
+			resolve()
+		}, 100)
+	})
 }
 
 const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay))
@@ -85,13 +85,12 @@ function typeToInputType(type)
 
 function getInputValue(input)
 {
-	if (input.type == "checkbox") {
-		return input.checked;
-	}
-	else if (input.type == "number") {
+	switch (input.type) {
+	case "checkbox":
 		return input.value;
-	}
-	else {
+	case "number":
+		return Number(input.value);
+	default:
 		return input.value;
 	}
 }
@@ -107,7 +106,7 @@ function setInputValue(input, value)
 }
 
 var createTableCount = 0;
-function createTable(object, editable = false, displayIcons = { "none": ">", "block": "v" })
+function createTable(object, datalists, editable = false, displayIcons = { "none": ">", "block": "v" })
 {
 	let div = document.createElement("div");
 
@@ -128,12 +127,30 @@ function createTable(object, editable = false, displayIcons = { "none": ">", "bl
 			propertyValue = createTable(object[p]);
 		}
 		else {
-			propertyValue = document.createElement("input");
+			if (datalists && datalists[p]) {
+				propertyValue = document.createElement("select");
+				
+				propertyValue.onchange = event => object[p] = window[getInputValue(propertyValue)];
+
+				for (let o = 0; o < datalists[p].length; o++) {
+					optionValue = datalists[p][o];
+					let option = document.createElement("option");
+					option.value = optionValue;
+					option.innerText = optionValue;
+					propertyValue.appendChild(option);
+
+					if (object[p] && optionValue == object[p].name)
+						propertyValue.selectedIndex = o;
+				}
+			}
+			else {
+				propertyValue = document.createElement("input");
+				propertyValue.type = typeToInputType(typeof object[p]);
+				setInputValue(propertyValue, object[p]);
+				propertyValue.onchange = event => object[p] = getInputValue(propertyValue);
+			}
 			propertyValue.id = "table"+createTableCount+"-"+p+"-input";
 			propertyValue.className = p+"-input";
-			propertyValue.type = typeToInputType(typeof object[p]);
-			setInputValue(propertyValue, object[p]);
-			propertyValue.onchange = event => object[p] = getInputValue(propertyValue);
 		}	
 		propertyTD2.appendChild(propertyValue);
 		propertyTR.appendChild(propertyTD1);
