@@ -4,6 +4,7 @@
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<link rel="stylesheet" type="text/css" href="./style/main.css" />
+		<title>Blackjack</title>
 	</head>
 	
 	<body>
@@ -20,15 +21,17 @@
 				<button id="surrender-button">Surrender</button>
 			</div>
 			<div class="other-input">
-				<button id="auto-button" class="betting-input playing-input">Auto</button>
+				<button id="auto-move-button" class="betting-input playing-input">Auto Move</button>
+				<button id="auto-step-button" class="betting-input playing-input">Auto Step</button>
 				<button id="next-button" class="debug">Next</button>
 			</div>
 		</div>
 
-		<div class="table">
+		<div id="table" class="table">
 			<div id="dealer-box"></div>
 			<div id="player-boxes"></div>
 			<button id="add-player-box-button">+</button>
+			<div id="table-settings"></div>
 		</div>
 
 		<script type="text/javascript" src="./script/generalPurpose.js"></script>
