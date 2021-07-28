@@ -71,9 +71,9 @@ td {
 	content: "$";
 }
 
-.disabled>* {
+
+.disabled {
 	pointer-events:none;
-	cursor: not-allowed !important;
 	opacity: 0.5 !important;
 }
 

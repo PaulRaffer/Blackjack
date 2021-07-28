@@ -1,172 +1,6 @@
 // Copyright (c) 2021 Paul Raffer
 
 
-
-
-
-// General Purpose
-
-function shuffle(array)
-{
-	for (let i = array.length - 1; i > 0; i--) {
-		let j = Math.floor(Math.random() * (i + 1));
-		[array[i], array[j]] = [array[j], array[i]];
-	}
-}
-
-function duplicate(array, n)
-{
-	var result = [];
-	for (i = 0; i < n; i++) {
-		result = result.concat(array);
-	}
-	return result;
-}
-
-function combineElements(arrayA, arrayB, op = (a, b) => a + b)
-{
-	var result = [];
-	for (a of arrayA) {
-		for (b of arrayB) {
-			result.push(op(a, b));
-		}
-	}
-	return result;
-}
-
-
-
-const waitUntil = (condition) => {
-    return new Promise((resolve) => {
-        let interval = setInterval(() => {
-            if (!condition()) {
-                return
-            }
-
-            clearInterval(interval)
-            resolve()
-        }, 100)
-    })
-}
-
-
-
-
-
-// Card Games
-
-const Suit = {
-	SPADES: '♠',
-	HEARTS: '♥',
-	DIAMONDS: '♦',
-	CLUBS: '♣',
-}
-
-const Rank = {
-	ACE: 'A',
-	TWO: '2',
-	THREE: '3',
-	FOUR: '4',
-	FIVE: '5',
-	SIX: '6',
-	SEVEN: '7',
-	EIGHT: '8',
-	NINE: '9',
-	TEN: 'T',
-	JACK: 'J',
-	QUEEN: 'Q',
-	KING: 'K',
-}
-
-function suitToHTMLUnicodeCardPart(suit)
-{
-	switch (suit) {
-	case Suit.SPADES:
-		return 'A';
-	case Suit.HEARTS:
-		return 'B';
-	case Suit.DIAMONDS:
-		return 'C';
-	case Suit.CLUBS:
-		return 'D';
-	}
-}
-
-function rankToHTMLUnicodeCardPart(rank)
-{
-	switch (rank) {
-	case Rank.ACE:
-		return '1';
-	case Rank.TEN:
-		return 'A';
-	case Rank.JACK:
-		return 'B';
-	case Rank.QUEEN:
-		return 'D';
-	case Rank.KING:
-		return 'E';
-	default:
-		return rank;
-	}
-}
-
-class Card {
-	constructor(suit, rank)
-	{
-		this.suit = suit;
-		this.rank = rank;
-	}
-
-	HTMLFront()
-	{
-		return '&#x1F0'
-				+ suitToHTMLUnicodeCardPart(this.suit)
-				+ rankToHTMLUnicodeCardPart(this.rank)
-				+ ';';
-	}
-
-	HTMLBack()
-	{
-		return '&#x1F0A0;';
-	}
-}
-
-function freshDeck()
-{
-	var cards = [];
-	Object.values(Suit).map(suit =>
-	Object.values(Rank).map(rank =>
-			cards.push(new Card(suit, rank))));
-	return cards;
-}
-
-
-function freshDecks(n)
-{
-	return duplicate(freshDeck(), n);
-}
-
-function cardsToString(cards)
-{
-	var cardsStr = "<span class=\"cards\">";
-	for (card of cards) {
-		cardsStr += "<span class=\"card "+card.suit+"\">"+card.HTMLFront()+"</span>";
-	}
-	cardsStr += "</span>";
-	return cardsStr;
-}
-
-function cardsToString2(cards)
-{
-	var cardsStr = "";
-	for (card of cards) {
-		cardsStr += card.suit + card.rank + " ";
-	}
-	return cardsStr;
-}
-
-
-
 const PlayerDecision = {
 	HIT: 'H',
 	STAND: 'S',
@@ -175,7 +9,21 @@ const PlayerDecision = {
 	SURRENDER: 'R',
 }
 
-
+const rankValues = {
+	'A': [11, 1],
+	'2': [ 2],
+	'3': [ 3],
+	'4': [ 4],
+	'5': [ 5],
+	'6': [ 6],
+	'7': [ 7],
+	'8': [ 8],
+	'9': [ 9],
+	'T': [10],
+	'J': [10],
+	'Q': [10],
+	'K': [10],
+};
 
 
 class Player {
@@ -183,131 +31,6 @@ class Player {
 	{
 		this.bankroll = bankroll;
 	}
-}
-
-function moneyToString(money)
-{
-	return "<span class=\"money\">"+money+"</span>";
-}
-
-function toggleBoxInfo(element)
-{
-	//let HTMLElement = document.getElementById("box"+id+"-info");
-	element.style.display =
-			element.style.display == "none" ||
-			element.style.display == ""
-					? "block" : "none";
-
-}
-
-function isObject(x)
-{
-	return typeof x === 'object' && x !== null;
-}
-
-
-function updateBoxPlayerBankroll(boxId, bankroll)
-{
-	bankroll;
-}
-
-function typeToInputType(type)
-{
-	switch (type) {
-	case "boolean":
-		return "checkbox";
-	default:
-		return type;
-	}
-}
-
-
-function getInputValue(input)
-{
-	if (input.type == "checkbox") {
-		return input.checked;
-	}
-	else if (input.type == "number") {
-		return input.value;
-	}
-	else {
-		return input.value;
-	}
-}
-
-function setInputValue(input, value)
-{
-	if (input.type == "checkbox") {
-		input.checked = value;
-	}
-	else {
-		input.value = value;
-	}
-}
-
-var createTableCount = 0;
-function createTable(object, editable = false, displayIcons = { "none": ">", "block": "v" })
-{
-	let div = document.createElement("div");
-
-	let propertiesTable = document.createElement("table");
-	propertiesTable.className = "properties";
-	for (let p in object)
-	{
-		let propertyTR = document.createElement("tr");
-		let propertyTD1 = document.createElement("td");
-		let propertyName = document.createElement("label");
-		propertyName.htmlFor = "table"+createTableCount+"-"+p+"-input";
-		propertyName.innerHTML = p+":";
-		propertyTD1.appendChild(propertyName);
-
-		let propertyTD2 = document.createElement("td");
-		let propertyValue = null;
-		if (isObject(object[p])) {
-			propertyValue = createTable(object[p]);
-		}
-		else {
-			propertyValue = document.createElement("input");
-			propertyValue.id = "table"+createTableCount+"-"+p+"-input";
-			propertyValue.className = p+"-input";
-			propertyValue.type = typeToInputType(typeof object[p]);
-			setInputValue(propertyValue, object[p]);
-			propertyValue.onchange = event => object[p] = getInputValue(propertyValue);
-		}	
-		propertyTD2.appendChild(propertyValue);
-		propertyTR.appendChild(propertyTD1);
-		propertyTR.appendChild(propertyTD2);
-		propertiesTable.appendChild(propertyTR);
-	}
-
-	let toggleTableButton = document.createElement("button");
-	toggleTableButton.className = "toggle";
-	toggleTableButton.onclick = () =>
-			{
-				propertiesTable.style.display =
-						propertiesTable.style.display == "none" ?
-								"block" : "none";
-				toggleTableButton.innerText = displayIcons[propertiesTable.style.display];
-			};
-	propertiesTable.style.display = "none";
-	toggleTableButton.innerText = displayIcons[propertiesTable.style.display];
-
-
-	let removeObjectButton = document.createElement("button");
-	removeObjectButton.className = "remove-object-button";
-	removeObjectButton.onclick = () =>
-			{
-			};
-	propertiesTable.style.display = "none";
-	removeObjectButton.innerText = "-";
-
-
-	div.appendChild(toggleTableButton);
-	div.appendChild(removeObjectButton);
-	div.appendChild(propertiesTable);
-
-	createTableCount++;
-	return div;
 }
 
 class Box {
@@ -411,24 +134,6 @@ class Hand {
 
 
 
-
-// Blackjack
-
-const rankValues = {
-	'A': [11, 1],
-	'2': [ 2],
-	'3': [ 3],
-	'4': [ 4],
-	'5': [ 5],
-	'6': [ 6],
-	'7': [ 7],
-	'8': [ 8],
-	'9': [ 9],
-	'T': [10],
-	'J': [10],
-	'Q': [10],
-	'K': [10],
-};
 
 
 function cardsValues(cards)
@@ -579,6 +284,67 @@ class Rules {
 }
 
 
+
+
+var nextFlag = false;
+
+function next(n = true)
+{
+	nextFlag = n;
+}
+
+
+
+
+function canMakeBettingDecision(box, stake, rules = new Rules())
+{
+	return true;
+}
+
+
+function isCorrectBettingDecision(box, stake)
+{
+	return box.bettingStrategy ? box.bettingStrategy() == stake : true;
+}
+
+
+function confirmIncorrectBettingDecision(box, stake)
+{
+	return confirm(
+			"Betting Strategy Error!\n\n" +
+			
+
+			"Your stake: " + stake + "\n" +
+			"Correct stake (" + box.bettingStrategy.name + "): " + box.bettingStrategy() + "\n\n" +
+			"Do you really want to continue?");
+}
+
+
+function makeBettingDecision(box, stake)
+{
+	return	phase == Phase.BETTING &&
+			canMakeBettingDecision(box, stake) &&
+			(isCorrectBettingDecision(box, stake) ||
+			!box.warnOnBettingError ||
+			confirmIncorrectBettingDecision(box, stake));
+}
+
+
+
+function placeBet(box)
+{
+	var stake = document.getElementById("stake").value;
+	if (makeBettingDecision(box, stake)) {
+		box.stake = stake;
+		next();
+	}
+}
+
+
+
+
+
+
 function canMakePlayingDecisionHit(hand, rules = new Rules())
 {
 	return true;
@@ -623,62 +389,11 @@ function canMakePlayingDecision(hand, decision, rules = new Rules())
 }
 
 
-var nextFlag = false;
-
-function next(n = true)
-{
-	nextFlag = n;
-}
-
-
-
-function canMakeBettingDecision(box, decision)
-{
-	return true;
-}
-
-function isCorrectBettingDecision(box, stake)
-{
-	return box.bettingStrategy ? box.bettingStrategy() == stake : true;
-}
-
-function confirmIncorrectBettingDecision(box, stake)
-{
-	return confirm(
-			"Betting Strategy Error!\n\n" +
-			
-
-			"Your stake: " + stake + "\n" +
-			"Correct stake (" + box.bettingStrategy.name + "): " + box.bettingStrategy() + "\n\n" +
-			"Do you really want to continue?");
-}
-
-function makeBettingDecision(box, stake)
-{
-	return	phase == Phase.BETTING &&
-			canMakeBettingDecision(box, stake) &&
-			(isCorrectBettingDecision(box, stake) ||
-			!box.warnOnBettingError ||
-			confirmIncorrectBettingDecision(box, stake));
-}
-
-
-
-function placeBet(box)
-{
-	var stake = document.getElementById("stake").value;
-	if (makeBettingDecision(box, stake)) {
-		box.stake = stake;
-		next();
-	}
-}
-
-
-
 function isCorrectPlayingDecision(hand, box, dealerHand, decision)
 {
 	return box.playingStrategy ? box.playingStrategy(hand, dealerHand) == decision : true;
 }
+
 
 function confirmIncorrectPlayingDecision(hand, box, dealerHand, decision)
 {
@@ -691,6 +406,7 @@ function confirmIncorrectPlayingDecision(hand, box, dealerHand, decision)
 			"Do you really want to continue?");
 }
 
+
 function makePlayingDecision(hand, box, dealerHand, decision)
 {
 	return	phase == Phase.PLAYING &&
@@ -699,6 +415,15 @@ function makePlayingDecision(hand, box, dealerHand, decision)
 			!box.warnOnPlayingError ||
 			confirmIncorrectPlayingDecision(hand, box, dealerHand, decision));
 }
+
+
+
+
+
+
+
+
+
 
 function playingDecisionHit(hand, box, remainingCards)
 {
@@ -716,12 +441,14 @@ function hit(hand, box, dealerHand, remainingCards)
 	}
 }
 
+
 function stand(hand, box, dealerHand, remainingCards)
 {
 	if (makePlayingDecision(hand, box, dealerHand, stand)) {
 		next();
 	}
 }
+
 
 function double(hand, box, dealerHand, remainingCards)
 {
@@ -732,6 +459,10 @@ function double(hand, box, dealerHand, remainingCards)
 		next();
 	}
 }
+
+const doubleHit = (hand, rules) => canMakePlayingDecisionDouble(hand, rules) ? double : hit;
+const doubleStand = (hand, rules) => canMakePlayingDecisionDouble(hand, rules) ? double : stand;
+
 
 function split(hand, box, dealerHand, remainingCards)
 {
@@ -745,6 +476,7 @@ function split(hand, box, dealerHand, remainingCards)
 	}
 }
 
+
 function surrender(hand, box, dealerHand, remainingCards)
 {
 	if (makePlayingDecision(hand, box, dealerHand, surrender)) {
@@ -754,18 +486,31 @@ function surrender(hand, box, dealerHand, remainingCards)
 	}
 }
 
-
-
-
-
-
-
-
-
 const surrenderHit = (hand, rules) => canMakePlayingDecisionDouble(hand, rules) ? surrender : hit;
 
-	const doubleHit = (hand, rules) => canMakePlayingDecisionDouble(hand, rules) ? double : hit;
-	const doubleStand = (hand, rules) => canMakePlayingDecisionDouble(hand, rules) ? double : stand;
+
+
+
+
+
+
+function auto(hand, box, dealerHand, remainingCards)
+{
+	next(false);
+	if (phase == Phase.BETTING) {
+		box.stake = box.bettingStrategy();
+	}
+	else if(phase == Phase.PLAYING) {
+		while(!(nextFlag || isHandValue21(hand))) {
+			box.playingStrategy(hand, dealerHand)
+					(hand, box, dealerHand, remainingCards);
+		}
+	}
+	next();
+}
+
+
+
 
 
 
@@ -786,6 +531,7 @@ function flatBettingStrategy(stake)
 	}
 	return flatBettingStrategy;
 }
+
 function martingaleBettingStrategy()
 {
 
@@ -828,7 +574,7 @@ function superEasyBasicStrategy(hand, dealerHand)
 function basicStrategySplit(hand, dealerHand, rules)
 {
 	const dealerHandValue = bestHandValue(dealerHand);
-	if (isHandValuePair(hand)) {
+	if (canMakePlayingDecisionSplit(hand, rules)) {
 		const cardValue = rankValues[hand.cards[0].rank];
 		console.log("pair: "+cardValue);
 		switch (cardValue[0]) {
@@ -1053,19 +799,19 @@ async function start(rules = new Rules())
 				box.HTMLElement.classList.add("current");
 				switch (phase) {
 				case Phase.BETTING:
-					let bettingInput = document.getElementById("betting-input");
-					bettingInput.classList.remove("disabled");
+					let bettingInput = document.getElementsByClassName("betting-input");
+					Array.from(bettingInput).forEach(e => e.classList.remove("disabled"));
 					await betting(box);
-					bettingInput.classList.add("disabled");
+					Array.from(bettingInput).forEach(e => e.classList.add("disabled"));
 					break;
 				case Phase.DEALING:
 					dealing(box, remainingCards);
 					break;
 				case Phase.PLAYING:
-					let playingInput = document.getElementById("playing-input");
-					playingInput.classList.remove("disabled");
+					let playingInput = document.getElementsByClassName("playing-input");
+					Array.from(playingInput).forEach(e => e.classList.remove("disabled"));
 					await playing(box, dealerBox.hands[0], remainingCards);
-					playingInput.classList.add("disabled");
+					Array.from(playingInput).forEach(e => e.classList.add("disabled"));
 					break;
 
 				case Phase.SHOWDOWN:
@@ -1097,6 +843,7 @@ async function start(rules = new Rules())
 					remainingCards = freshShuffledDecks(rules.numDecks);
 					resetRunningCounts(boxes);
 				}
+				await sleep(100);
 				break;
 			}
 			dealerBox.HTMLElement.classList.remove("current");
@@ -1161,7 +908,7 @@ var playerBoxesDiv = document.getElementById('player-boxes');
 var player = new Player(10000);
 var playerBoxes = [
 		new Box(player, playerBoxesDiv,
-				undefined, false, false,
+				flatBettingStrategy(10), false, false,
 				basicStrategy, false, true,
 				hiLoCountingStrategy)];
 
@@ -1203,9 +950,11 @@ surrenderButton.onclick = () => surrender(playerBoxes[boxI].hands[handI], player
 let nextButton = document.getElementById("next-button");
 nextButton.onclick = next;
 
+let autoButton = document.getElementById("auto-button");
+autoButton.onclick = () => auto(playerBoxes[boxI].hands[handI], playerBoxes[boxI], dealerBox.hands[0], remainingCards);
 
-let playingInput = document.getElementById("playing-input");
-playingInput.classList.add("disabled");
+let playingInput = document.getElementsByClassName("playing-input");
+Array.from(playingInput).forEach(e => e.classList.add("disabled"));
 
 
 let addPlayerBoxButton = document.getElementById("add-player-box-button");
