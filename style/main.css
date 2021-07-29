@@ -80,6 +80,26 @@ td {
 	content: "$";
 }
 
+.hit {
+	background-color: red;
+}
+
+.stand {
+	background-color: yellow;
+}
+
+.double {
+	background-color: blue;
+}
+
+.split {
+	background-color: green;
+}
+
+.surrender {
+	background-color: white;
+}
+
 
 .disabled {
 	pointer-events:none;

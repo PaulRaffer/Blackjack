@@ -105,8 +105,8 @@ function setInputValue(input, value)
 	}
 }
 
-var createTableCount = 0;
-function createTable(object, datalists, editable = false, displayIcons = { "none": ">", "block": "v" })
+var createObjectControlCount = 0;
+function createObjectControl(object, datalists, editable = false, displayIcons = { "none": ">", "block": "v" })
 {
 	let div = document.createElement("div");
 
@@ -117,14 +117,14 @@ function createTable(object, datalists, editable = false, displayIcons = { "none
 		let propertyTR = document.createElement("tr");
 		let propertyTD1 = document.createElement("td");
 		let propertyName = document.createElement("label");
-		propertyName.htmlFor = "table"+createTableCount+"-"+p+"-input";
+		propertyName.htmlFor = "table"+createObjectControlCount+"-"+p+"-input";
 		propertyName.innerHTML = p+":";
 		propertyTD1.appendChild(propertyName);
 
 		let propertyTD2 = document.createElement("td");
 		let propertyValue = null;
 		if (isObject(object[p])) {
-			propertyValue = createTable(object[p]);
+			propertyValue = createObjectControl(object[p]);
 		}
 		else {
 			if (datalists && datalists[p]) {
@@ -133,13 +133,13 @@ function createTable(object, datalists, editable = false, displayIcons = { "none
 				propertyValue.onchange = event => object[p] = window[getInputValue(propertyValue)];
 
 				for (let o = 0; o < datalists[p].length; o++) {
-					optionValue = datalists[p][o];
+					optionName = datalists[p][o].name;
 					let option = document.createElement("option");
-					option.value = optionValue;
-					option.innerText = optionValue;
+					option.value = optionName;
+					option.innerText = optionName;
 					propertyValue.appendChild(option);
 
-					if (object[p] && optionValue == object[p].name)
+					if (object[p] && optionName == object[p].name)
 						propertyValue.selectedIndex = o;
 				}
 			}
@@ -149,7 +149,7 @@ function createTable(object, datalists, editable = false, displayIcons = { "none
 				setInputValue(propertyValue, object[p]);
 				propertyValue.onchange = event => object[p] = getInputValue(propertyValue);
 			}
-			propertyValue.id = "table"+createTableCount+"-"+p+"-input";
+			propertyValue.id = "table"+createObjectControlCount+"-"+p+"-input";
 			propertyValue.className = p+"-input";
 		}	
 		propertyTD2.appendChild(propertyValue);
@@ -184,6 +184,6 @@ function createTable(object, datalists, editable = false, displayIcons = { "none
 	div.appendChild(removeObjectButton);
 	div.appendChild(propertiesTable);
 
-	createTableCount++;
+	createObjectControlCount++;
 	return div;
 }

@@ -57,14 +57,11 @@ class Box {
 		this.id = id;
 		
 
-		let propertiesTable = createTable(this, {
-				bettingStrategy: [flatBettingStrategy(10).name],
-				playingStrategy: [basicStrategy.name, superEasyBasicStrategy.name, dealerS17Strategy.name, dealerH17Strategy.name],
-				countingStrategy: [hiLoCountingStrategy.name, koCountingStrategy.name]});
+		let propertiesTable = createObjectControl(this, {
+				bettingStrategy: [flatBettingStrategy(10)],
+				playingStrategy: [basicStrategy, superEasyBasicStrategy, dealerS17Strategy, dealerH17Strategy],
+				countingStrategy: [hiLoCountingStrategy, koCountingStrategy]});
 		
-
-
-
 		this.settingsDiv = document.createElement("div");
 		this.settingsDiv.id = "box"+id+"-info";
 		this.settingsDiv.className = "box-info";
@@ -550,8 +547,143 @@ function flatBettingStrategy(stake)
 
 function martingaleBettingStrategy()
 {
-
+	
 }
+
+
+
+function playingStrategyToTable(strategy, rules)
+{
+	const ranks = ['2', '3', '4', '5', '6', '7', '8', '9', 'T', 'A'];
+	const softRanks = ['2', '3', '4', '5', '6', '7', '8', '9'];
+
+	let strategyTable = document.createElement("table");
+
+	// Pairs
+	{
+		let strategyTRdealerHandValue = document.createElement("tr");
+		let strategyTDTitle = document.createElement("td");
+		strategyTDTitle.innerText = "Pairs";
+		strategyTRdealerHandValue.appendChild(strategyTDTitle);
+		for (dealerRank of ranks) {
+			let strategyTDhandValue = document.createElement("td");
+			strategyTDhandValue.innerText = dealerRank;
+			strategyTRdealerHandValue.appendChild(strategyTDhandValue);
+		}
+		strategyTable.appendChild(strategyTRdealerHandValue);
+	}
+	for (rank of ranks) {
+		let strategyTR = document.createElement("tr");
+		
+		let cards = [new Card(undefined, rank), new Card(undefined, rank)];
+		let hand = new Hand(cards);
+
+		let strategyTDhandValue = document.createElement("td");
+		strategyTDhandValue.innerText = rank+","+rank;
+		strategyTR.appendChild(strategyTDhandValue);
+
+		for (dealerRank of ranks) {
+			let dealerCards = [new Card(undefined, dealerRank)];
+			let dealerHand = new Hand(dealerCards);
+
+			let strategyTD = document.createElement("td");
+			const correctDecision = strategy(hand, dealerHand, rules);
+			if (correctDecision)
+				strategyTD.className = strategyTD.innerText = correctDecision.name;
+
+			strategyTR.appendChild(strategyTD);
+		}
+		strategyTable.appendChild(strategyTR);
+	}
+
+
+	// Soft Totals
+	{
+		let strategyTRdealerHandValue = document.createElement("tr");
+		let strategyTDTitle = document.createElement("td");
+		strategyTDTitle.innerText = "Soft";
+		strategyTRdealerHandValue.appendChild(strategyTDTitle);
+		for (dealerRank of ranks) {
+			let strategyTDhandValue = document.createElement("td");
+			strategyTDhandValue.innerText = dealerRank;
+			strategyTRdealerHandValue.appendChild(strategyTDhandValue);
+		}
+		strategyTable.appendChild(strategyTRdealerHandValue);
+	}
+	for (rank of softRanks) {
+		let strategyTR = document.createElement("tr");
+		
+		let cards = [new Card(undefined, 'A'), new Card(undefined, rank)];
+		let hand = new Hand(cards);
+
+		let strategyTDhandValue = document.createElement("td");
+		strategyTDhandValue.innerText = 'A'+","+rank;
+		strategyTR.appendChild(strategyTDhandValue);
+
+		for (dealerRank of ranks) {
+			let dealerCards = [new Card(undefined, dealerRank)];
+			let dealerHand = new Hand(dealerCards);
+
+			let strategyTD = document.createElement("td");
+			const correctDecision = strategy(hand, dealerHand, rules);
+			if (correctDecision)
+				strategyTD.className = strategyTD.innerText = correctDecision.name;
+
+			strategyTR.appendChild(strategyTD);
+		}
+		strategyTable.appendChild(strategyTR);
+	}
+
+
+	// Hard Totals
+	{
+		let strategyTRdealerHandValue = document.createElement("tr");
+		let strategyTDTitle = document.createElement("td");
+		strategyTDTitle.innerText = "Hard";
+		strategyTRdealerHandValue.appendChild(strategyTDTitle);
+		for (dealerRank of ranks) {
+			let strategyTDhandValue = document.createElement("td");
+			strategyTDhandValue.innerText = dealerRank;
+			strategyTRdealerHandValue.appendChild(strategyTDhandValue);
+		}
+		strategyTable.appendChild(strategyTRdealerHandValue);
+	}
+	let cardRanks = [3, 2];
+	let c = 0;
+	while (cardRanks[1] <= 8) {
+		let strategyTR = document.createElement("tr");
+		
+		let cards = [new Card(undefined, cardRanks[0]), new Card(undefined, cardRanks[1])];
+		let hand = new Hand(cards);
+
+		let strategyTDhandValue = document.createElement("td");
+		strategyTDhandValue.innerText = cardRanks[0]+cardRanks[1];
+		strategyTR.appendChild(strategyTDhandValue);
+
+		for (dealerRank of ranks) {
+			let dealerCards = [new Card(undefined, dealerRank)];
+			let dealerHand = new Hand(dealerCards);
+
+			let strategyTD = document.createElement("td");
+			const correctDecision = strategy(hand, dealerHand, rules);
+			if (correctDecision)
+				strategyTD.className = strategyTD.innerText = correctDecision.name;
+
+			strategyTR.appendChild(strategyTD);
+		}
+		strategyTable.appendChild(strategyTR);
+
+		cardRanks[c]++;
+		if (cardRanks[c] >= 10)
+			cardRanks[c] = 'T';
+		c = c == 0 ? 1 : 0;
+	}
+
+
+
+	return strategyTable;
+}
+
 
 
 
@@ -607,13 +739,13 @@ function basicStrategySplit(hand, dealerHand, rules)
 			}
 			break;
 		case 6:
-			if ((dealerHandValue >= 3 && dealerHandValue <= 7)
+			if ((dealerHandValue >= 3 && dealerHandValue <= 6)
 			|| (dealerHandValue == 2 && rules.canDoubleAfterSplit)) {
 				return split;
 			}
 			break;
 		case 4:
-			if ((dealerHandValue >= 5 && dealerHandValue <= 7) && rules.canDoubleAfterSplit) {
+			if ((dealerHandValue >= 5 && dealerHandValue <= 6) && rules.canDoubleAfterSplit) {
 				return split;
 			}
 			break;
@@ -999,10 +1131,11 @@ addPlayerBoxButton.onclick = () =>
 							hiLoCountingStrategy));
 		}
 
-let tableSettings = createTable(table);
+let tableSettings = createObjectControl(table);
 
 let tableDiv = document.getElementById("table-settings");
 tableDiv.appendChild(tableSettings);
+
 
 function main()
 {
