@@ -298,7 +298,7 @@ function next(n = true)
 
 function canMakeBettingDecision(box, stake, rules)
 {
-	return true;
+	return stake >= rules.limits.min && stake <= rules.limits.max;
 }
 
 
@@ -1083,9 +1083,9 @@ var table = new Table();
 
 
 let stakeInput = document.getElementById("stake");
-stakeInput.min = table.rules.limits.min;
+/*stakeInput.min = table.rules.limits.min;
 stakeInput.max = table.rules.limits.max;
-stakeInput.placeholder = table.rules.limits.min+"<x<"+table.rules.limits.max;
+stakeInput.placeholder = table.rules.limits.min+"<x<"+table.rules.limits.max;*/
 stakeInput.value = table.rules.limits.min;
 
 let placeBetButton = document.getElementById("place-bet-button");

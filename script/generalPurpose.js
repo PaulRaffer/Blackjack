@@ -87,7 +87,7 @@ function getInputValue(input)
 {
 	switch (input.type) {
 	case "checkbox":
-		return input.value;
+		return input.checked;
 	case "number":
 		return Number(input.value);
 	default:
