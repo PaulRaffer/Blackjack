@@ -9,9 +9,17 @@ td {
 	vertical-align: top;
 }
 
-.input {
+#game {
 	position: fixed;
-	bottom: 0;
+	width: 100%;
+	height: 100%;
+}
+
+.table {
+	background-color: #5E9537;
+}
+
+.input {
 	flex-grow: 1;
 	display: flex;
 	width: 100%;
@@ -40,28 +48,107 @@ td {
 	width: 6em;
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
 @media only screen and (min-width: 540px) {
 	.table, .table>*, .hands {
-		display: inline-flex;
+		display: flex;
 	}
+	.table>div {
+		flex-grow: 1;
+	}
+}*/
+.hands {
+	display: flex;
+	min-height: 11em;
+	white-space: nowrap;
+	width: 100%;
+	max-width: 100%;
+	overflow: hidden;
+}
+.hand {
+	
+	width: 100%;
+	overflow: auto;
+}
+
+.table {
+	display: flex;
+	width: 100%;
+	max-width: 100%;
+	height: calc(100% - 2em);
+	margin: 0;
+	padding: 0;
+}
+.table>#boxes {
+	flex-grow: 1;
+	white-space: nowrap; /*!*/
+	overflow-x: auto;
+	overflow-y: hidden; /*!*/
+	height: 100%;
+	margin: 0;
+	padding: 0;
 }
 
 
-.box {
-	margin: 0.3em;
+
+.table>#boxes>.box {
+	flex-grow: 1;
+	height: 100%; /*!*/
+	display: none;
+	display: inline-block;
+	background-color: lightblue;
+	min-width: 25em;
+	opacity: 94%;
+
+	resize: horizontal;
+	overflow-x: auto;
+	overflow-y: hidden;
+
+	margin: 0;
+	padding: 0;
+
+	display: inline-flex;
+	flex-direction: column;
 }
+
+
+.table>#boxes>.box>.box-info {
+	
+	overflow-y: auto;
+}
+
+
+
+
 
 
 .hands {
 	display: inline-flex;
 }
 
-
-.box.current {
+.table>#boxes>.box.dealer {
+	display: inline-flex;
+	background-color: rgb(58, 187, 180);
+}
+.table>#boxes>.box.current {
+	display: inline-flex;
 	background-color: lightgreen;
 }
 .hand.current {
-	background-color: #0BDA51;
+	background-color: rgb(132, 211, 132);
 }
 
 .card {
@@ -105,7 +192,7 @@ td {
 
 
 .disabled {
-	pointer-events:none;
+	pointer-events: none;
 	opacity: 0.5 !important;
 }
 

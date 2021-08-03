@@ -44,7 +44,7 @@ const waitUntil = (condition) => {
 	})
 }
 
-const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay))
+const waitFor = (delay) => new Promise((resolve) => setTimeout(resolve, delay))
 
 
 
