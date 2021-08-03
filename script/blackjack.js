@@ -20,109 +20,6 @@ const rankValues = {
 };
 
 
-class Player {
-	constructor(bankroll)
-	{
-		this.bankroll = bankroll;
-	}
-}
-
-class BoxTimeouts {
-	constructor(autoBet = 0, deal = 0, autoPlay = 0, showdown = 0)
-	{
-		this.autoBet = autoBet;
-		this.deal = deal;
-		this.autoPlay = autoPlay;
-		this.showdown = showdown;
-	}
-}
-
-class Box {
-	static count = 0;
-
-	constructor(
-			player, htmlParentElement,
-			bettingStrategy, autoBet = false, warnOnBettingError = false,
-			playingStrategy, autoPlay = false, warnOnPlayingError = false,
-			countingStrategy,
-			timeouts = new BoxTimeouts(),
-			runningCount = 0,
-			hands = [], stake = 0, id = Box.count++)
-	{
-		this.player = player;
-		this.bettingStrategy = bettingStrategy;
-		this.autoBet = autoBet;
-		this.warnOnBettingError = warnOnBettingError;
-		this.playingStrategy = playingStrategy;
-		this.autoPlay = autoPlay;
-		this.warnOnPlayingError = warnOnPlayingError;
-		this.countingStrategy = countingStrategy;
-		this.timeouts = timeouts;
-		this.runningCount = runningCount;
-		this.hands = hands;
-		this.stake = stake;
-		this.id = id;
-		
-
-		let propertiesTable = createObjectControl(this, {
-				bettingStrategy: [flatBettingStrategy(10)],
-				playingStrategy: [basicStrategy, superEasyBasicStrategy, dealerS17Strategy, dealerH17Strategy],
-				countingStrategy: [hiLoCountingStrategy, koCountingStrategy]});
-		
-		this.settingsDiv = document.createElement("div");
-		this.settingsDiv.id = "box"+id+"-info";
-		this.settingsDiv.className = "box-info";
-
-		this.settingsDiv.appendChild(propertiesTable);
-
-
-		this.handsDiv = document.createElement("div");
-		this.handsDiv.className = "hands";
-
-		this.infoDiv = document.createElement("div");
-		this.infoDiv.innerHTML =
-				"<table class=\"properties\">"+
-					"<tr><td>Bankroll:</td><td><span id=\"bankroll-info\" class=\"money\"></span></td></tr>"+
-					"<tr><td>Running:</td><td id=\"running-count-info\"></td></tr>"+
-				"</table>";
-
-
-		this.HTMLElement = document.createElement("div");
-		htmlParentElement.appendChild(this.HTMLElement);
-		this.HTMLElement.className = "box";
-
-		this.HTMLElement.innerHTML = "";
-		this.HTMLElement.appendChild(this.handsDiv);
-		this.HTMLElement.appendChild(this.infoDiv);
-		this.HTMLElement.appendChild(this.settingsDiv);
-
-		this.update();
-	}
-
-	clearHands()
-	{
-		this.hands.map(hand =>
-				{
-					this.handsDiv.removeChild(hand.HTMLElement);
-				});
-	}
-
-	update()
-	{
-		let bankrollInfo = this.infoDiv.querySelector("#bankroll-info");
-		bankrollInfo.innerText = this.player.bankroll;
-		let runningCountInfo = this.infoDiv.querySelector("#running-count-info");
-		runningCountInfo.innerText = this.runningCount;
-
-		this.handsDiv.innerHTML = "";
-		this.hands.map(hand =>
-				{
-					this.handsDiv.appendChild(hand.HTMLElement);
-					hand.update();
-				});
-	}
-}
-
 
 class Hand {
 	constructor(cards = [], stake = 0, resplitCount = 0)
@@ -298,6 +195,112 @@ class Rules {
 }
 
 
+class Player {
+	constructor(bankroll)
+	{
+		this.bankroll = bankroll;
+	}
+}
+
+class BoxTimeouts {
+	constructor(autoBet = 0, deal = 0, autoPlay = 0, showdown = 0)
+	{
+		this.autoBet = autoBet;
+		this.deal = deal;
+		this.autoPlay = autoPlay;
+		this.showdown = showdown;
+	}
+}
+
+const strategies = {
+	bettingStrategy: [flatBettingStrategy(10), flatBettingStrategy(100), flatBettingStrategy(1000)],
+	playingStrategy: [basicStrategy, superEasyBasicStrategy, noBustStrategy, dealerS17Strategy, dealerH17Strategy],
+	countingStrategy: [hiLoCountingStrategy, koCountingStrategy]
+};
+
+class Box {
+	static count = 0;
+
+	constructor(
+			player, htmlParentElement,
+			bettingStrategy, autoBet = false, warnOnBettingError = false,
+			playingStrategy, autoPlay = false, warnOnPlayingError = false,
+			countingStrategy,
+			timeouts = new BoxTimeouts(),
+			runningCount = 0,
+			hands = [], stake = 0, id = Box.count++)
+	{
+		this.player = player;
+		this.bettingStrategy = bettingStrategy;
+		this.autoBet = autoBet;
+		this.warnOnBettingError = warnOnBettingError;
+		this.playingStrategy = playingStrategy;
+		this.autoPlay = autoPlay;
+		this.warnOnPlayingError = warnOnPlayingError;
+		this.countingStrategy = countingStrategy;
+		this.timeouts = timeouts;
+		this.runningCount = runningCount;
+		this.hands = hands;
+		this.stake = stake;
+		this.id = id;
+		
+
+		let propertiesTable = createObjectControl(this, strategies);
+		
+		this.settingsDiv = document.createElement("div");
+		this.settingsDiv.id = "box"+id+"-info";
+		this.settingsDiv.className = "box-info";
+
+		this.settingsDiv.appendChild(propertiesTable);
+
+
+		this.handsDiv = document.createElement("div");
+		this.handsDiv.className = "hands";
+
+		this.infoDiv = document.createElement("div");
+		this.infoDiv.innerHTML =
+				"<table class=\"properties\">"+
+					"<tr><td>Bankroll:</td><td><span id=\"bankroll-info\" class=\"money\"></span></td></tr>"+
+					"<tr><td>Running:</td><td id=\"running-count-info\"></td></tr>"+
+				"</table>";
+
+
+		this.HTMLElement = document.createElement("div");
+		htmlParentElement.appendChild(this.HTMLElement);
+		this.HTMLElement.className = "box";
+
+		this.HTMLElement.innerHTML = "";
+		this.HTMLElement.appendChild(this.handsDiv);
+		this.HTMLElement.appendChild(this.infoDiv);
+		this.HTMLElement.appendChild(this.settingsDiv);
+
+		this.update();
+	}
+
+	clearHands()
+	{
+		this.hands.map(hand =>
+				{
+					this.handsDiv.removeChild(hand.HTMLElement);
+				});
+	}
+
+	update()
+	{
+		let bankrollInfo = this.infoDiv.querySelector("#bankroll-info");
+		bankrollInfo.innerText = this.player.bankroll;
+		let runningCountInfo = this.infoDiv.querySelector("#running-count-info");
+		runningCountInfo.innerText = this.runningCount;
+
+		this.handsDiv.innerHTML = "";
+		this.hands.map(hand =>
+				{
+					this.handsDiv.appendChild(hand.HTMLElement);
+					hand.update();
+				});
+	}
+}
+
 
 
 var nextFlag = false;
@@ -316,6 +319,16 @@ function canMakeBettingDecision(box, stake, rules)
 }
 
 
+function alertIllegalBettingDecision(box, stake, rules)
+{
+	console.log("Hallo");
+	return alert(
+			"Illegal Betting Decision!\n\n" +
+			"Your stake: " + stake + "$\n" +
+			"Limits: " + rules.limits.min+"$..."+rules.limits.max+"$");
+}
+
+
 function isCorrectBettingDecision(box, stake, rules)
 {
 	return box.bettingStrategy ? box.bettingStrategy(rules) == stake : true;
@@ -328,7 +341,7 @@ function confirmIncorrectBettingDecision(box, stake, rules)
 			"Betting Strategy Error!\n\n" +
 			
 
-			"Your stake: " + stake + "\n" +
+			"Your stake: " + stake + "$\n" +
 			"Correct stake (" + box.bettingStrategy.name + "): " + box.bettingStrategy(rules) + "\n\n" +
 			"Do you really want to continue?");
 }
@@ -337,21 +350,26 @@ function confirmIncorrectBettingDecision(box, stake, rules)
 function makeBettingDecision(box, stake, rules)
 {
 	return	phase == Phase.BETTING &&
-			canMakeBettingDecision(box, stake, rules) &&
+			(canMakeBettingDecision(box, stake, rules) || alertIllegalBettingDecision(box, stake, rules)) &&
 			(isCorrectBettingDecision(box, stake, rules) ||
 			!box.warnOnBettingError ||
 			confirmIncorrectBettingDecision(box, stake, rules));
 }
 
 
+function placeBet(stake) {
+	return (box, rules) => {
+		if (makeBettingDecision(box, stake, rules)) {
+			box.stake = stake;
+			next();
+		}
+	}
+}
 
-function placeBet(box, rules)
+function placeBetOnClick(box, rules)
 {
 	var stake = document.getElementById("stake").value;
-	if (makeBettingDecision(box, stake, rules)) {
-		box.stake = stake;
-		next();
-	}
+	placeBet(stake)(box, rules);
 }
 
 
@@ -404,6 +422,16 @@ function canMakePlayingDecision(hand, decision, rules)
 }
 
 
+function alertIllegalPlayingDecision(hand, box, dealerHand, decision, rules)
+{
+	return alert(
+			"Illegal Playing Decision!\n\n" +
+			"Your hand: " + cardsToString2(hand.cards) + "= " + validHandValues(hand) + "\n" +
+			"Dealers hand: " + cardsToString2(dealerHand.cards) + "= " + validHandValues(dealerHand) + "\n" +
+			"Your decision: " + decision.name);
+}
+
+
 function isCorrectPlayingDecision(hand, box, dealerHand, decision, rules)
 {
 	return box.playingStrategy ? box.playingStrategy(hand, dealerHand, rules) == decision : true;
@@ -425,7 +453,7 @@ function confirmIncorrectPlayingDecision(hand, box, dealerHand, decision, rules)
 function makePlayingDecision(hand, box, dealerHand, decision, rules)
 {
 	return	phase == Phase.PLAYING &&
-			canMakePlayingDecision(hand, decision, rules) &&
+			(canMakePlayingDecision(hand, decision, rules) || alertIllegalPlayingDecision(hand, box, dealerHand, decision, rules)) &&
 			(isCorrectPlayingDecision(hand, box, dealerHand, decision, rules) ||
 			!box.warnOnPlayingError ||
 			confirmIncorrectPlayingDecision(hand, box, dealerHand, decision, rules));
@@ -501,7 +529,7 @@ function surrender(hand, box, dealerHand, remainingCards, rules)
 	}
 }
 
-const surrenderHit = (hand, rules) => canMakePlayingDecisionDouble(hand, rules) ? surrender : hit;
+const surrenderHit = (hand, rules) => canMakePlayingDecisionSurrender(hand, rules) ? surrender : hit;
 
 
 
@@ -513,7 +541,7 @@ function autoMove(hand, box, dealerHand, remainingCards, rules)
 {
 	next(false);
 	if (phase == Phase.BETTING) {
-		box.stake = box.bettingStrategy(rules);
+		box.bettingStrategy(rules)(box, rules);
 	}
 	else if(phase == Phase.PLAYING) {
 		while(!(nextFlag || isHandValue21(hand))) {
@@ -528,7 +556,7 @@ function autoStep(hand, box, dealerHand, remainingCards, rules)
 {
 	next(false);
 	if (phase == Phase.BETTING) {
-		box.stake = box.bettingStrategy(rules);
+		box.bettingStrategy(rules)(box, rules);
 		next();
 	}
 	else if(phase == Phase.PLAYING) {
@@ -555,14 +583,25 @@ function flatBettingStrategy(stake)
 {
 	function flatBettingStrategy(rules)
 	{
-		return stake;
+		return placeBet(stake);
 	}
 	return flatBettingStrategy;
 }
 
+function flatBettingStrategyMin(rules)
+{
+	return flatBettingStrategy(rules.limits.min);
+}
+
+function flatBettingStrategyMax(rules)
+{
+	return flatBettingStrategy(rules.limits.max);
+}
+
+
 function martingaleBettingStrategy()
 {
-	
+	//TODO
 }
 
 
@@ -835,46 +874,6 @@ function noBustStrategy(hand, dealerHand)
 
 
 
-
-
-/*
-class CardCountingStrategy {
-	constructor(
-			name, cardValues,
-			bettingCorrelation, playingEfficiency, insuranceCorrelation,
-			ease, balanced, suitAware, compromiseIndexes, level)
-	{
-		this.name = name;
-		this.cardValues = cardValues;
-		this.bettingCorrelation = bettingCorrelation;
-		this.playingEfficiency = playingEfficiency;
-		this.insuranceCorrelation = insuranceCorrelation;
-		this.ease = ease;
-		this.balanced = balanced;
-		this.suitAware = suitAware;
-		this.compromiseIndexes = compromiseIndexes;
-		this.level = level;
-	}
-}
-
-const HiLo = new CardCountingStrategy("HiLo", {
-	'A': -1,
-	'2': +1,
-	'3': +1,
-	'4': +1,
-	'5': +1,
-	'6': +1,
-	'7':  0,
-	'8':  0,
-	'9':  0,
-	'T': -1,
-	'J': -1,
-	'Q': -1,
-	'K': -1,
-}, .97, .63, .76, 6, true, false, false, 1);
-*/
-
-
 function countCard(card, boxes)
 {
 	boxes.map(box =>
@@ -932,7 +931,7 @@ async function betting(box, rules)
 	next(false);
 	if (box.autoBet && box.bettingStrategy) {
 		await waitFor(box.timeouts.autoBet);
-		box.stake = box.bettingStrategy(rules);
+		box.bettingStrategy(rules)(box, rules);
 	}
 	else {
 		let bettingInput = document.getElementsByClassName("betting-input");
@@ -1079,32 +1078,6 @@ async function start(table)
 }
 
 
-
-
-var boxesDiv = document.getElementById("boxes");
-
-var dealer = new Player(0);
-var dealerBox = new Box(dealer, boxesDiv,
-		undefined, false, false,
-		dealerS17Strategy, true, false);
-dealerBox.HTMLElement.classList.add("dealer");
-
-var player = new Player(10000);
-var playerBoxes = [
-		new Box(player, boxesDiv,
-				flatBettingStrategy(10), false, false,
-				basicStrategy, false, true,
-				hiLoCountingStrategy)];
-
-
-var boxI = 0;
-var handI = 0;
-
-
-var remainingCards = freshShuffledDecks(6);
-var phase = Phase.BETTING;
-
-
 class TableTimeouts {
 	constructor(betweenRounds = 0, shuffling = 0)
 	{
@@ -1126,6 +1099,33 @@ class Table {
 var table = new Table();
 
 
+var boxesDiv = document.getElementById("boxes");
+
+var dealer = new Player(0);
+var dealerBox = new Box(dealer, boxesDiv,
+		undefined, false, false,
+		dealerS17Strategy, true, false);
+dealerBox.HTMLElement.classList.add("dealer");
+
+var player = new Player(10000);
+var playerBoxes = [
+		new Box(player, boxesDiv,
+				flatBettingStrategyMin(table.rules), false, false,
+				basicStrategy, false, true,
+				hiLoCountingStrategy)];
+
+
+var boxI = 0;
+var handI = 0;
+
+
+var remainingCards = freshShuffledDecks(6);
+var phase = Phase.BETTING;
+
+
+
+
+
 
 let stakeInput = document.getElementById("stake");
 /*stakeInput.min = table.rules.limits.min;
@@ -1134,7 +1134,7 @@ stakeInput.placeholder = table.rules.limits.min+"<x<"+table.rules.limits.max;*/
 stakeInput.value = table.rules.limits.min;
 
 let placeBetButton = document.getElementById("place-bet-button");
-placeBetButton.onclick = () => placeBet(playerBoxes[boxI], table.rules);
+placeBetButton.onclick = () => placeBetOnClick(playerBoxes[boxI], table.rules);
 
 let hitButton = document.getElementById("hit-button");
 hitButton.onclick = () => hit(playerBoxes[boxI].hands[handI], playerBoxes[boxI], dealerBox.hands[0], remainingCards, table.rules);
@@ -1173,7 +1173,7 @@ addPlayerBoxButton.onclick = () =>
 			let player = new Player(10000);
 			playerBoxes.push(
 					new Box(player, boxesDiv,
-							flatBettingStrategy(10), false, false,
+							flatBettingStrategyMin(table.rules), false, false,
 							basicStrategy, false, true,
 							hiLoCountingStrategy));
 		}
