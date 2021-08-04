@@ -155,41 +155,6 @@ td {
 }*/
 
 
-/*
-@media screen and (orientation: portrait) {
-.table {
-	flex-direction: column;
-}
-
-.table>#boxes {
-	overflow-y: auto;
-}
-
-.table>#boxes>.box {
-	min-width: 100%;
-	max-width: 100%;
-}
-}
-
-@media screen and (orientation: landscape) {
-.table {
-	flex-direction: row;
-}
-
-.table>#boxes {
-	overflow-x: auto;
-	white-space: nowrap;
-}
-
-.table>#boxes>.box {
-	resize: horizontal;
-	overflow: auto;
-	height: 100%;
-	min-width: 26em;
-}
-}*/
-
-
 
 
 

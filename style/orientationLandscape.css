@@ -14,3 +14,10 @@
     max-height: 100%;
 	min-width: 26em;
 }
+
+@media only screen and (max-width: 50em) {
+	.table>#boxes>.box {
+		width: 19.5em;
+		min-width: 19.5em;
+	}
+}
