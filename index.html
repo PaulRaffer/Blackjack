@@ -6,20 +6,43 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		
 		<link rel="stylesheet" type="text/css" href="./style/main.css" />
+		<link rel="stylesheet" type="text/css" media="screen and ((orientation: portrait) or (max-width: 50em))" href="./style/orientationPortrait.css" />
+		<link rel="stylesheet" type="text/css" media="screen and ((orientation: landscape) and (min-width: 50em))" href="./style/orientationLandscape.css" />
+		
 		<title>Blackjack</title>
+		
 		<link rel="icon" href="https://gitlab.com/RafferGames/Blackjack/metadata/-/raw/main/listings/en-US/graphics/icon/1.png" />
 	</head>
 	
 	<body>
-		
 		<div id="game">
+			<div id="links">
+				<div class="source-code">
+					<span><a target="_blank" href="https://github.com/PaulRaffer/Blackjack">Source code</a></span>
+				</div>
+				<div class="contact">
+					<span class="feature"><a target="_blank" href="https://github.com/PaulRaffer/Blackjack/issues">Request feature</a></span>
+					<span class="bug"><a target="_blank" href="https://github.com/PaulRaffer/Blackjack/issues">Report bug</a></span>
+					<span class="email"><a href="mailto:blackjack.i1ii1@aleeas.com">Email</a></span>
+				</div>
+				<div class="download">
+					<span><a target="_blank" href="https://gitlab.com/RafferGames/Blackjack/android/-/releases">APK</a></span>
+					<span><a target="_blank" href="https://f-droid.org/en/packages/crypto.o0o0o0o0o.games.blackjack">F-Droid</a></span>
+					<span><a target="_blank" href="https://play.google.com/store/apps/details?id=crypto.o0o0o0o0o.games.blackjack">Google Play</a></span>
+				</div>
+				<div class="copyright">
+					<span>&copy; <span class="years">2021</span> <a target="_blank" href="https://paulraffer.github.io">Paul Raffer</a>.</span>
+				</div>
+			</div>
+
 			<div id="table" class="table">
 				<div id="table-settings"></div>
 				<div id="boxes"></div>
 				<button id="add-player-box-button">+</button>
 			</div>
-			
+
 			<div id="input" class="input">
 				<div class="betting-input">
 					<span class="money"><input id="stake" type="number"/></span>

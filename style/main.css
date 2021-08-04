@@ -1,6 +1,11 @@
 /* Copyright (c) 2021 Paul Raffer */
 
 
+* {
+	box-sizing: border-box;
+	font-family: 'Courier New', Courier, monospace;
+}
+
 body {
 	margin: 0;
 }
@@ -13,11 +18,48 @@ td {
 	position: fixed;
 	width: 100%;
 	height: 100%;
-}
-
-.table {
 	background-color: #5E9537;
 }
+
+
+#links {
+	min-height: 1em;
+	max-height: 1em;
+	font-size: 0.8em;
+	line-height: 1em;
+	width: 100%;
+	display: inline-flex;
+	text-align: center;
+	white-space: nowrap;
+}
+
+#links>* {
+	flex-grow: 1;
+	display: inherit;
+}
+
+#links>*>* {
+	flex-grow: 1;
+}
+
+@media only screen and (max-width: 46em) {
+#links>.download {
+	display: none;
+}
+}
+
+@media only screen and (max-width: 36em) {
+#links>.contact>.email, #links>.copyright .years {
+	display: none;
+}
+}
+
+@media only screen and (max-width: 26em) {
+#links>.source-code {
+	display: none;
+}
+}
+
 
 .input {
 	flex-grow: 1;
@@ -86,18 +128,14 @@ td {
 
 .table {
 	display: flex;
-	width: 100%;
+	min-width: 100%;
 	max-width: 100%;
-	height: calc(100% - 2em);
+	height: calc(100% - 3em);
 	margin: 0;
 	padding: 0;
 }
 .table>#boxes {
 	flex-grow: 1;
-	white-space: nowrap; /*!*/
-	overflow-x: auto;
-	overflow-y: hidden; /*!*/
-	height: 100%;
 	margin: 0;
 	padding: 0;
 }
@@ -105,34 +143,60 @@ td {
 
 
 .table>#boxes>.box {
-	flex-grow: 1;
-	height: 100%; /*!*/
-	display: none;
-	display: inline-block;
 	background-color: lightblue;
-	min-width: 25em;
 	opacity: 94%;
-
-	resize: horizontal;
-	overflow-x: auto;
-	overflow-y: hidden;
-
-	margin: 0;
-	padding: 0;
-
 	display: inline-flex;
+	flex-direction: column;
+	margin: 0;
+	padding: 0.5em;
+}
+/*.table>#boxes>.box {
+	display: none;
+}*/
+
+
+/*
+@media screen and (orientation: portrait) {
+.table {
 	flex-direction: column;
 }
 
-
-.table>#boxes>.box>.box-info {
-	
+.table>#boxes {
 	overflow-y: auto;
 }
 
+.table>#boxes>.box {
+	min-width: 100%;
+	max-width: 100%;
+}
+}
+
+@media screen and (orientation: landscape) {
+.table {
+	flex-direction: row;
+}
+
+.table>#boxes {
+	overflow-x: auto;
+	white-space: nowrap;
+}
+
+.table>#boxes>.box {
+	resize: horizontal;
+	overflow: auto;
+	height: 100%;
+	min-width: 26em;
+}
+}*/
 
 
 
+
+
+
+.table>#boxes>.box>.box-info {
+	overflow: auto;
+}
 
 
 .hands {
@@ -196,7 +260,7 @@ td {
 	opacity: 0.5 !important;
 }
 
-@media only screen and (max-width: 540px) {
+@media only screen and (max-width: 40em) {
 	.disabled {
 		display: none;
 	}

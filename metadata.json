@@ -1,0 +1,73 @@
+{
+	"title": "Blackjack",
+	"categories": [
+		"games"
+	],
+	"graphics": {
+		"icon": "https://gitlab.com/RafferGames/Blackjack/metadata/-/raw/main/listings/en-US/graphics/icon/1.png",
+		"featureGraphic": "https://gitlab.com/RafferGames/Blackjack/metadata/-/raw/main/listings/en-US/graphics/feature-graphic/1.png"
+	},
+	"platforms": {
+		"browser": {
+			"licenses": [
+				"https://github.com/PaulRaffer/Blackjack/blob/main/LICENSE"
+			],
+			"sourceCode": "https://github.com/PaulRaffer/Blackjack",
+			"repoType": "git",
+			"website": "https://paulraffer.github.io/Blackjack"
+		},
+		"android": {
+			"licenses": [
+				"https://gitlab.com/RafferGames/Blackjack/android/-/blob/main/LICENSE"
+			],
+			"sourceCode": "https://gitlab.com/RafferGames/Blackjack/android",
+			"metadata": "https://gitlab.com/RafferGames/Blackjack/metadata",
+			"downloads": {
+				"apk": {
+					"url": "https://gitlab.com/RafferGames/Blackjack/android/-/releases",
+				},
+				"fDroid": {
+					"url": "https://f-droid.org/en/packages/crypto.o0o0o0o0o.games.blackjack",
+					"metadata": "https://gitlab.com/fdroid/fdroiddata/-/blob/master/metadata/crypto.o0o0o0o0o.games.blackjack.yml",
+				},
+				"googlePlay": {
+					"url": "https://play.google.com/store/apps/details?id=crypto.o0o0o0o0o.games.blackjack"
+				}
+			},
+			"graphics": {
+				"screenshots": {
+					"phone": [
+						"https://gitlab.com/RafferGames/Blackjack/metadata/-/raw/main/listings/en-US/graphics/phone-screenshots/1.jpg",
+						"https://gitlab.com/RafferGames/Blackjack/metadata/-/raw/main/listings/en-US/graphics/phone-screenshots/2.jpg",
+						"https://gitlab.com/RafferGames/Blackjack/metadata/-/raw/main/listings/en-US/graphics/phone-screenshots/3.jpg",
+						"https://gitlab.com/RafferGames/Blackjack/metadata/-/raw/main/listings/en-US/graphics/phone-screenshots/4.jpg",
+						"https://gitlab.com/RafferGames/Blackjack/metadata/-/raw/main/listings/en-US/graphics/phone-screenshots/5.jpg",
+						"https://gitlab.com/RafferGames/Blackjack/metadata/-/raw/main/listings/en-US/graphics/phone-screenshots/6.jpg",
+						"https://gitlab.com/RafferGames/Blackjack/metadata/-/raw/main/listings/en-US/graphics/phone-screenshots/7.jpg",
+						"https://gitlab.com/RafferGames/Blackjack/metadata/-/raw/main/listings/en-US/graphics/phone-screenshots/8.jpg"
+					]
+				},
+				"videos": [
+					"https://gitlab.com/RafferGames/Blackjack/metadata/-/raw/main/listings/en-US/graphics/videos/_001.mp4",
+					"https://youtu.be/iEXq9zSX0Js"
+				]
+			}
+		}
+	},
+	"contact": {
+		"email": "blackjack.i1ii1@aleeas.com"
+	},
+	"donate": {
+		"bitcoin": "bc1q7a92kr26m5sp6u49cru8652vt5x8s0sfqekpl0"
+	},
+	"author": {
+		"name": "Paul Raffer",
+		"website": "https://paulraffer.github.io",
+		"contact": {
+			"website": "https://paulraffer.github.io/?p=contact",
+			"email": "paul.raffer.bitfv@aleeas.com",
+			"gitlab": "https://gitlab.com/PaulRaffer",
+			"github": "https://github.com/PaulRaffer"
+		}
+	}
+}

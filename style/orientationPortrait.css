@@ -1,0 +1,12 @@
+.table {
+	flex-direction: column;
+}
+
+.table>#boxes {
+	overflow-y: auto;
+}
+
+.table>#boxes>.box {
+	min-width: 100%;
+	max-width: 100%;
+}
