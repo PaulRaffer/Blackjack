@@ -1,19 +1,6 @@
 /* Copyright (c) 2021 Paul Raffer */
 
 
-* {
-	box-sizing: border-box;
-	font-family: 'Courier New', Courier, monospace;
-}
-
-body {
-	margin: 0;
-}
-
-td {
-	vertical-align: top;
-}
-
 #game {
 	position: fixed;
 	width: 100%;
@@ -92,26 +79,6 @@ td {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-/*
-@media only screen and (min-width: 540px) {
-	.table, .table>*, .hands {
-		display: flex;
-	}
-	.table>div {
-		flex-grow: 1;
-	}
-}*/
 .hands {
 	display: flex;
 	min-height: 11em;
@@ -143,6 +110,8 @@ td {
 
 
 .table>#boxes>.box {
+	max-width: 100%;
+	width:25%;
 	background-color: lightblue;
 	opacity: 94%;
 	display: inline-flex;
@@ -180,24 +149,6 @@ td {
 	background-color: rgb(132, 211, 132);
 }
 
-.card {
-	font-size: 6em;
-}
-
-.♠, .♣ {
-	color: black;
-}
-.♥, .♦ {
-	color: red;
-}
-
-.money {
-	color: goldenrod;
-}
-
-.money::after {
-	content: "$";
-}
 
 .hit {
 	background-color: red;
@@ -217,20 +168,4 @@ td {
 
 .surrender {
 	background-color: white;
-}
-
-
-.disabled {
-	pointer-events: none;
-	opacity: 0.5 !important;
-}
-
-@media only screen and (max-width: 40em) {
-	.disabled {
-		display: none;
-	}
-}
-
-.debug {
-	display: none;
 }

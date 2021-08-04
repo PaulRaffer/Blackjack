@@ -1,0 +1,32 @@
+/* Copyright (c) 2021 Paul Raffer */
+
+
+* {
+	box-sizing: border-box;
+	font-family: 'Courier New', Courier, monospace;
+}
+
+body {
+	margin: 0;
+}
+
+td {
+	vertical-align: top;
+}
+
+
+
+.disabled {
+	pointer-events: none;
+	opacity: 0.5 !important;
+}
+
+@media only screen and (max-width: 40em) {
+	.disabled {
+		display: none;
+	}
+}
+
+.debug {
+	display: none;
+}

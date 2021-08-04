@@ -7,8 +7,9 @@
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		
-		<link rel="stylesheet" type="text/css" href="./style/main.css" />
-		<!--<link rel="stylesheet" type="text/css" media="only screen and (orientation: landscape)" href="./style/orientationLandscape.css" />-->
+		<link rel="stylesheet" type="text/css" href="./style/generalPurpose.css" />
+		<link rel="stylesheet" type="text/css" href="./style/cardGames.css" />
+		<link rel="stylesheet" type="text/css" href="./style/blackjack.css" />
 		<link rel="stylesheet" type="text/css" media="screen and (min-width: 46em) and (orientation: landscape)" href="./style/orientationLandscape.css" />
 		<link rel="stylesheet" type="text/css" media="not screen and (min-width: 46em) and (orientation: landscape)" href="./style/orientationPortrait.css" />
 		
@@ -39,7 +40,9 @@
 			</div>
 
 			<div id="table" class="table">
-				<div id="table-settings"></div>
+				<div id="table-info">
+					<div id="rounds-per-minute"></div>
+				</div>
 				<div id="boxes"></div>
 				<button id="add-player-box-button">+</button>
 			</div>
@@ -57,8 +60,8 @@
 					<button id="surrender-button">Surrender</button>
 				</div>
 				<div class="other-input">
-					<button id="auto-move-button" class="betting-input playing-input">Auto Move</button>
-					<button id="auto-step-button" class="betting-input playing-input">Auto Step</button>
+					<button id="auto-move-button">Auto Move</button>
+					<button id="auto-step-button">Auto Step</button>
 					<button id="next-button" class="debug">Next</button>
 				</div>
 			</div>
@@ -66,6 +69,7 @@
 
 		<script type="text/javascript" src="./script/generalPurpose.js"></script>
 		<script type="text/javascript" src="./script/cardsGames.js"></script>
+		<script type="text/javascript" src="./script/strategies.js"></script>
 		<script type="text/javascript" src="./script/blackjack.js"></script>
 	</body>
 </html>

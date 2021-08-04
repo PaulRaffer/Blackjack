@@ -148,6 +148,18 @@ function createObjectControl(object, datalists, editable = false, displayIcons =
 				propertyValue.type = typeToInputType(typeof object[p]);
 				setInputValue(propertyValue, object[p]);
 				propertyValue.onchange = event => object[p] = getInputValue(propertyValue);
+				
+				let oldValue = object[p];
+				new Promise((resolve) => {
+					let interval = setInterval(() => {
+						if (oldValue != object[p]) {
+							setInputValue(propertyValue, object[p]);
+							oldValue = object[p];
+						}
+					}, 1000)
+				})
+
+
 			}
 			propertyValue.id = "table"+createObjectControlCount+"-"+p+"-input";
 			propertyValue.className = p+"-input";
