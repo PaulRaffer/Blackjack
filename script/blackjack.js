@@ -610,12 +610,12 @@ async function betting(box, rules)
 		box.bettingStrategy(rules)(box, rules);
 	}
 	else {
-		let bettingInput = document.getElementsByClassName("betting-input");
-		Array.from(bettingInput).forEach(e => e.classList.remove("disabled"));
+		let bettingInput = document.getElementById("betting-input");
+		bettingInput.classList.remove("disabled");
 		
 		await waitUntil(() => nextFlag);
 
-		Array.from(bettingInput).forEach(e => e.classList.add("disabled"));
+		bettingInput.classList.add("disabled");
 	}
 }
 
@@ -631,7 +631,8 @@ async function dealing(box, remainingCards, rules)
 
 function enablePlayingButtons(hand, rules)
 {
-	let playingInput = document.getElementsByClassName("playing-input");
+	let playingInput = document.getElementById("playing-input");
+	playingInput.classList.remove("disabled");
 	PlayerDecision.forEach(decision =>
 			{
 				let button = document.getElementById(decision.name+"-button");
@@ -644,10 +645,8 @@ function enablePlayingButtons(hand, rules)
 
 function disablePlayingButtons()
 {
-	let playingInput = document.getElementsByClassName("playing-input");
-	Array.from(playingInput).forEach(e =>
-		Array.from(e.children).forEach(c =>
-			c.classList.add("disabled")));
+	let playingInput = document.getElementById("playing-input");
+	playingInput.classList.add("disabled");
 }
 
 async function autoPlay(box, hand, dealerHand, remainingCards, rules)
@@ -875,10 +874,7 @@ let autoStepButton = document.getElementById("auto-step-button");
 autoStepButton.onclick = () => autoStep(playerBoxes[boxI].hands[handI], playerBoxes[boxI], dealerBox.hands[0], remainingCards, table.rules);
 
 
-let playingInput = document.getElementsByClassName("playing-input");
-Array.from(playingInput).forEach(e =>
-Array.from(e.children).forEach(c =>
-	c.classList.add("disabled")));
+disablePlayingButtons();
 
 
 let addPlayerBoxButton = document.getElementById("add-player-box-button");

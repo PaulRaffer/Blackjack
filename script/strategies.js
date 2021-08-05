@@ -279,6 +279,15 @@ function basicStrategy(hand, dealerHand, rules)
 
 
 
+
+
+
+
+
+
+
+
+
 function noBustStrategy(hand, dealerHand)
 {
 	if (cardsValues(hand.cards)[0] <= 11) {

@@ -23,10 +23,10 @@ td {
 
 @media only screen and (max-width: 40em) {
 	.disabled {
-		display: none;
+		display: none !important;
 	}
 }
 
 .debug {
-	display: none;
+	display: none !important;
 }
