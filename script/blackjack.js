@@ -695,7 +695,7 @@ async function showdown(box, dealerBox, rules)
 
 		hand.HTMLElement.classList.add("current");
 		let profit = 0;
-		if (isHandNatural(hand) && !isHandNatural(dealerHand.cards)) {
+		if (isHandNatural(hand) && !isHandNatural(dealerHand)) {
 			profit = hand.stake * rules.payouts.natural;
 		}
 		else if (isHandBust(hand) || bestHandValue(hand) < bestHandValue(dealerHand)) {
