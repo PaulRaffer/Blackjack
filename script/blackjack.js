@@ -279,10 +279,10 @@ class Box {
 
 	clearHands()
 	{
-		this.hands.map(hand =>
-				{
-					this.handsDiv.removeChild(hand.HTMLElement);
-				});
+		this.hands.forEach(hand =>
+		{
+			this.handsDiv.removeChild(hand.HTMLElement);
+		});
 	}
 
 	update()
@@ -293,11 +293,11 @@ class Box {
 		runningCountInfo.innerText = this.runningCount;
 
 		this.handsDiv.innerHTML = "";
-		this.hands.map(hand =>
-				{
-					this.handsDiv.appendChild(hand.HTMLElement);
-					hand.update();
-				});
+		this.hands.forEach(hand =>
+		{
+			this.handsDiv.appendChild(hand.HTMLElement);
+			hand.update();
+		});
 	}
 }
 
@@ -576,6 +576,12 @@ const Phase = {
 	SHOWDOWN: 3,
 }
 
+const Phases = [
+	betting,
+	dealing,
+	playing,
+	showdown,
+]
 
 
 
@@ -622,8 +628,8 @@ async function betting(box, rules)
 async function dealing(box, remainingCards, rules)
 {
 	await waitFor(box.timeouts.deal);
+	box.clearHands();
 	if (box.stake >= rules.limits.min && box.stake <= rules.limits.max) {
-		box.clearHands();
 		box.hands = [new Hand([drawAndCountCard(remainingCards, playerBoxes), drawAndCountCard(remainingCards, playerBoxes)], box.stake)];
 		box.update();
 	}
@@ -686,33 +692,76 @@ async function playing(box, dealerHand, remainingCards, rules)
 }
 
 
+function isHandOnlyNatural(hand, hand2)
+{
+	return isHandNatural(hand) && !isHandNatural(hand2);
+}
+
+function isHandBustOrLess(hand, hand2)
+{
+	return isHandBust(hand) || bestHandValue(hand) < bestHandValue(hand2);
+}
+
+function payout(hand, dealerHand, rules)
+{
+	return	isHandOnlyNatural(hand, dealerHand) ?
+				rules.payouts.natural :
+			isHandBustOrLess(hand, dealerHand) ?
+				rules.payouts.loss :
+			isHandBustOrLess(dealerHand, hand) ?
+				rules.payouts.win :
+				rules.payouts.push;
+}
+
+function moveMoney(profit, box, dealerBox)
+{
+	box.player.bankroll += profit;
+	dealerBox.player.bankroll -= profit;
+}
+
 async function showdown(box, dealerBox, rules)
 {
 	await waitFor(box.timeouts.showdown);
 	let dealerHand = dealerBox.hands[0];
-	for (handI = 0; handI < box.hands.length; handI++) {
-		var hand = box.hands[handI];
-
+	box.hands.forEach(hand => {
 		hand.HTMLElement.classList.add("current");
-		let profit = 0;
-		if (isHandNatural(hand) && !isHandNatural(dealerHand)) {
-			profit = hand.stake * rules.payouts.natural;
-		}
-		else if (isHandBust(hand) || bestHandValue(hand) < bestHandValue(dealerHand)) {
-			profit = hand.stake * rules.payouts.loss;
-		}
-		else if (isHandBust(dealerHand) || bestHandValue(dealerHand) < bestHandValue(hand)) {
-			profit = hand.stake * rules.payouts.win;
-		}
-		else {
-			profit = hand.stake * rules.payouts.push;
-		}
-		box.player.bankroll += profit;
-		dealerBox.player.bankroll -= profit;
+		const profit = hand.stake * payout(hand, dealerHand, rules);
+		moveMoney(profit, box, dealerBox);
 		hand.HTMLElement.classList.remove("current");
+	});
+	dealerBox.update();
+}
+
+
+function isCutCardReached(table)
+{
+	return remainingCards.length <= (1 - table.rules.deckPenetration) * 52 * table.rules.numDecks;
+}
+
+function dealingDealer(playerBoxes, dealerBox, remainingCards)
+{
+	dealerBox.hands = [new Hand([drawAndCountCard(remainingCards, playerBoxes)])];
+	dealerBox.update();
+}
+
+function playingDealer(dealerBox, remainingCards)
+{
+	next(false);
+	while(!nextFlag) {
+		dealerBox.playingStrategy(dealerBox.hands[0], dealerBox.hands[0])
+				(dealerBox.hands[0], dealerBox, dealerBox.hands[0], remainingCards, table.rules);
 	}
 }
 
+async function showdownDealer(table)
+{
+	await waitFor(table.timeouts.betweenRounds);
+	if (isCutCardReached(table)) {
+		resetRunningCounts(playerBoxes);
+		remainingCards = freshShuffledDecks(table.rules.numDecks);
+		await waitFor(table.timeouts.shuffling);
+	}
+}
 
 async function start(table)
 {
@@ -740,7 +789,6 @@ async function start(table)
 					break;
 				case Phase.SHOWDOWN:
 					await showdown(box, dealerBox, table.rules);
-					dealerBox.update();
 					break;
 				}
 				box.HTMLElement.classList.remove("current");
@@ -750,25 +798,13 @@ async function start(table)
 			dealerBox.HTMLElement.classList.add("current");
 			switch (phase) {
 			case Phase.DEALING:
-				dealerBox.hands = [new Hand([drawAndCountCard(remainingCards, playerBoxes)])];
-				dealerBox.update();
+				dealingDealer(playerBoxes, dealerBox, remainingCards);
 				break;
-
 			case Phase.PLAYING:
-				next(false);
-				while(!nextFlag) {
-					dealerBox.playingStrategy(dealerBox.hands[0], dealerBox.hands[0])
-							(dealerBox.hands[0], dealerBox, dealerBox.hands[0], remainingCards, table.rules);
-				}
+				playingDealer(dealerBox, remainingCards);
 				break;
-
 			case Phase.SHOWDOWN:
-				await waitFor(table.timeouts.betweenRounds);
-				if (remainingCards.length <= (1 - table.rules.deckPenetration) * 52 * table.rules.numDecks) {
-					resetRunningCounts(playerBoxes);
-					remainingCards = freshShuffledDecks(table.rules.numDecks);
-					await waitFor(table.timeouts.shuffling);
-				}
+				await showdownDealer(table);
 				break;
 			}
 			dealerBox.HTMLElement.classList.remove("current");

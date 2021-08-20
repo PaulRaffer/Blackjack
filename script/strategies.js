@@ -277,7 +277,20 @@ function basicStrategy(hand, dealerHand, rules)
 			undefined;
 }
 
+function basicStrategyIllustrious18(hand, dealerHand, rules, trueCount)
+{
+	if (rules.numDecks == 1) {
+		if (trueCount >= 1.4) {
+			
+		}
+	}
+	else if (rules.numDecks == 2) {
 
+	}
+	else if (rules.numDecks > 2) {
+
+	}
+}
 
 
 
