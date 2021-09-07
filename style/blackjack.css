@@ -100,7 +100,7 @@ a {
 	display: flex;
 	min-width: 100%;
 	max-width: 100%;
-	height: calc(100% - 3em);
+	height: calc(100% - 3.2em);
 	margin: 0;
 	padding: 0;
 }
@@ -109,8 +109,6 @@ a {
 	margin: 0;
 	padding: 0;
 }
-
-
 
 .table>#boxes>.box {
 	max-width: 100%;
@@ -151,6 +149,25 @@ a {
 	flex-grow: 1;
 	display: flex;
 	margin: 0.1em;
+}
+
+@media only screen
+	and (min-device-width: 320px)
+	and (max-device-width: 1000px) {
+
+.card {
+	font-size: 1.4em;
+	margin-top: -0.25em;
+	margin-bottom: -0.25em;
+}
+
+.input {
+	height: 2.8em;
+}
+.table {
+	height: calc(100% - 4em);
+}
+
 }
 
 
