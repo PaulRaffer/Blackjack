@@ -1,11 +1,14 @@
 /* Copyright (c) 2021 Paul Raffer */
 
 
+a {
+	color: inherit;
+}
+
 #game {
 	position: fixed;
 	width: 100%;
 	height: 100%;
-	background-color: #5E9537;
 }
 
 
@@ -81,7 +84,7 @@
 
 .hands {
 	display: flex;
-	min-height: 11em;
+	min-height: 12em;
 	white-space: nowrap;
 	width: 100%;
 	max-width: 100%;
@@ -112,7 +115,6 @@
 .table>#boxes>.box {
 	max-width: 100%;
 	width:25%;
-	background-color: lightblue;
 	opacity: 94%;
 	display: inline-flex;
 	flex-direction: column;
@@ -139,14 +141,16 @@
 
 .table>#boxes>.box.dealer {
 	display: inline-flex;
-	background-color: rgb(58, 187, 180);
 }
 .table>#boxes>.box.current {
 	display: inline-flex;
-	background-color: lightgreen;
 }
-.hand.current {
-	background-color: rgb(132, 211, 132);
+
+.cards {
+	font-size: 6em;
+	flex-grow: 1;
+	display: flex;
+	margin: 0.1em;
 }
 
 
