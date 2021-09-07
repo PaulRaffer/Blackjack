@@ -80,6 +80,10 @@ a {
 	width: 6em;
 }
 
+button.toggle {
+	height: 2em;
+	width: 2em;
+}
 
 
 .hands {

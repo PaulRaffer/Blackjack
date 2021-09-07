@@ -182,18 +182,7 @@ function createObjectControl(object, datalists, editable = false, displayIcons =
 	propertiesTable.style.display = "none";
 	toggleTableButton.innerText = displayIcons[propertiesTable.style.display];
 
-
-	let removeObjectButton = document.createElement("button");
-	removeObjectButton.className = "remove-object-button";
-	removeObjectButton.onclick = () =>
-			{
-			};
-	propertiesTable.style.display = "none";
-	removeObjectButton.innerText = "-";
-
-
 	div.appendChild(toggleTableButton);
-	div.appendChild(removeObjectButton);
 	div.appendChild(propertiesTable);
 
 	createObjectControlCount++;
