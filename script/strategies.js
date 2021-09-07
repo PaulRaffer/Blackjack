@@ -1,3 +1,12 @@
+/*function flatBettingStrategy(stake)
+{
+	function flatBettingStrategy(box, rules)
+	{
+		return new BettingDecision(box, stake, rules).placeBet();
+	}
+	return flatBettingStrategy;
+}*/
+
 function flatBettingStrategy(stake)
 {
 	function flatBettingStrategy(rules)

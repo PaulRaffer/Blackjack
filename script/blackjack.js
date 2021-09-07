@@ -100,14 +100,17 @@ function hasNCards(n)
 	return cards => cards.length == n;
 }
 
-function isPair(cards)
+const has2Cards = hasNCards(2);
+
+
+function isRankPair(cards)
 {
-	return hasNCards(2)(cards) && cards[0].rank == cards[1].rank;
+	return has2Cards(cards) && cards[0].rank == cards[1].rank;
 }
 
 function isValuePair(cards)
 {
-	return hasNCards(2)(cards) && rankValues[cards[0].rank][0] == rankValues[cards[1].rank][0];
+	return has2Cards(cards) && rankValues[cards[0].rank][0] == rankValues[cards[1].rank][0];
 }
 
 function isValueN(n)
@@ -116,6 +119,7 @@ function isValueN(n)
 }
 
 const isValue21 = isValueN(21);
+
 
 function isHandSoft(hand)
 {
@@ -142,9 +146,9 @@ function isHandFresh(hand)
 	return hand.resplitCount == 0 && hasHandNCards(2)(hand);
 }
 
-function isHandPair(hand)
+function isHandRankPair(hand)
 {
-	return isPair(hand.cards);
+	return isRankPair(hand.cards);
 }
 
 function isHandValuePair(hand)
@@ -162,6 +166,10 @@ function isHandNatural(hand)
 	return isHandFresh(hand) && isHandValue21(hand);
 }
 
+function isHandSplit(hand)
+{
+	return hand.resplitCount > 0;
+}
 
 
 class Payouts {
@@ -179,16 +187,24 @@ class Rules {
 	constructor(
 			limits = { min: 10, max: 100 }, payouts = new Payouts(), numRounds = Infinity,
 			numDecks = 6, deckPenetration = .75,
-			canDoubleAfterSplit = true, resplitLimit = Infinity,
-			canSurrender = false, europeanHoleCard = true)
+			resplitLimit = Infinity,
+			canDoubleAfterSplit = true,
+			canSplitSameRankOnly = false,
+			canResplitAces = true,
+			canHitSplitAces = false,
+			canSurrender = false,
+			europeanHoleCard = true)
 	{
 		this.limits = limits;
 		this.payouts = payouts;
 		this.numRounds = numRounds;
 		this.numDecks = numDecks;
 		this.deckPenetration = deckPenetration;
-		this.canDoubleAfterSplit = canDoubleAfterSplit;
 		this.resplitLimit = resplitLimit;
+		this.canDoubleAfterSplit = canDoubleAfterSplit;
+		this.canSplitSameRankOnly = canSplitSameRankOnly;
+		this.canResplitAces = canResplitAces;
+		this.canHitSplitAces = canHitSplitAces;
 		this.canSurrender = canSurrender;
 		this.europeanHoleCard = europeanHoleCard;
 	}
@@ -313,56 +329,92 @@ function next(n = true)
 
 
 
-function canMakeBettingDecision(box, stake, rules)
-{
-	return stake >= rules.limits.min && stake <= rules.limits.max;
+
+
+
+
+
+
+
+
+
+
+class Decision {
+	
 }
 
 
-function alertIllegalBettingDecision(box, stake, rules)
+class BettingDecision extends Decision {
+
+constructor(box, stake, rules)
 {
-	console.log("Hallo");
+	super();
+	this.box = box;
+	this.stake = stake;
+	this.rules = rules;
+}
+
+isLegal()
+{
+	return this.stake >= this.rules.limits.min && this.stake <= this.rules.limits.max;
+}
+
+alertIllegal()
+{
 	return alert(
-			"Illegal Betting Decision!\n\n" +
-			"Your stake: " + stake + "$\n" +
-			"Limits: " + rules.limits.min+"$..."+rules.limits.max+"$");
+		"Illegal Betting Decision!\n\n" +
+		"Your stake: " + this.stake + "$\n" +
+		"Limits: " + this.rules.limits.min+"$..."+this.rules.limits.max+"$");
 }
 
-
-function isCorrectBettingDecision(box, stake, rules)
+isCorrect()
 {
-	return box.bettingStrategy ? box.bettingStrategy(rules) == stake : true;
+	return this.box.bettingStrategy ? this.box.bettingStrategy(this.box, this.rules) == this.stake : true;
 }
 
-
-function confirmIncorrectBettingDecision(box, stake, rules)
+confirmIncorrect()
 {
 	return confirm(
-			"Betting Strategy Error!\n\n" +
-			
+		"Betting Strategy Error!\n\n" +
+		
 
-			"Your stake: " + stake + "$\n" +
-			"Correct stake (" + box.bettingStrategy.name + "): " + box.bettingStrategy(rules) + "\n\n" +
-			"Do you really want to continue?");
+		"Your stake: " + this.stake + "$\n" +
+		"Correct stake (" + this.box.bettingStrategy.name + "): " + this.box.bettingStrategy(this.box, this.rules) + "\n\n" +
+		"Do you really want to continue?");
 }
 
-
-function makeBettingDecision(box, stake, rules)
+isConfirmed()
 {
 	return	phase == Phase.BETTING &&
-			(canMakeBettingDecision(box, stake, rules) || alertIllegalBettingDecision(box, stake, rules)) &&
-			(isCorrectBettingDecision(box, stake, rules) ||
-			!box.warnOnBettingError ||
-			confirmIncorrectBettingDecision(box, stake, rules));
+		(this.isLegal() || this.alertIllegal()) &&
+		(!this.box.warnOnBettingError ||
+		this.isCorrect() || this.confirmIncorrect());
 }
+
+make()
+{
+	if (this.isConfirmed()) {
+		this.box.stake = this.stake;
+		next();
+	}
+}
+
+}
+
+
+class PlayingDecision extends Decision {
+
+}
+
+
+
+
 
 
 function placeBet(stake) {
 	return (box, rules) => {
-		if (makeBettingDecision(box, stake, rules)) {
-			box.stake = stake;
-			next();
-		}
+		let bettingDecision = new BettingDecision(box, stake, rules);
+		bettingDecision.make();
 	}
 }
 
@@ -379,7 +431,7 @@ function placeBetOnClick(box, rules)
 
 function canMakePlayingDecisionHit(hand, rules)
 {
-	return true;
+	return !isHandSplit(hand) || hand.cards[0].rank != Rank.ACE || rules.canHitSplitAces;
 }
 
 function canMakePlayingDecisionStand(hand, rules)
@@ -390,13 +442,19 @@ function canMakePlayingDecisionStand(hand, rules)
 function canMakePlayingDecisionDouble(hand, rules)
 {
 	return hasHandNCards(2)(hand)
-			&& (hand.resplitCount == 0 || rules.canDoubleAfterSplit);
+			&& (!isHandSplit(hand) || rules.canDoubleAfterSplit);
+}
+
+function isHandSplitablePair(rules)
+{
+	return rules.canSplitSameRankOnly ? isHandRankPair : isHandValuePair;
 }
 
 function canMakePlayingDecisionSplit(hand, rules)
 {
-	return isHandValuePair(hand)
-			&& hand.resplitCount < rules.resplitLimit;
+	return isHandSplitablePair(rules)(hand)
+			&& hand.resplitCount < rules.resplitLimit
+			&& (hand.cards[0].rank != Rank.ACE || !isHandSplit(hand) || rules.canResplitAces);
 }
 
 function canMakePlayingDecisionSurrender(hand, rules)
