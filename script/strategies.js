@@ -258,6 +258,7 @@ function basicStrategy(hand, dealerHand, rules)
 					dealerHandValue >= 4 && dealerHandValue <= 6 ? doubleHit(hand, rules) : hit :
 				handValue <= 14 && handValue >= 13 ?
 					dealerHandValue >= 5 && dealerHandValue <= 6 ? doubleHit(hand, rules) : hit :
+				handValue == 12 ? hit :
 				undefined :
 			isHandHard(hand) ?
 				handValue == 16 && dealerHandValue >= 9 && dealerHandValue <= 11 ? surrenderHit(hand, rules) :
