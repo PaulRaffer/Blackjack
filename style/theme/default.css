@@ -20,30 +20,30 @@ input, button, select {
 	border-color: #447741;
 }
 
-.table>#boxes>.box {
+.table #boxes>.box {
 	background-color: #59954A;
 }
-.table>#boxes>.box input,
-.table>#boxes>.box button,
-.table>#boxes>.box select {
+.table #boxes>.box input,
+.table #boxes>.box button,
+.table #boxes>.box select {
 	border-color: #447741;
 }
 
-.table>#boxes>.box.dealer {
+.table #boxes>.box.dealer {
 	background-color: #447741;
 }
-.table>#boxes>.box.dealer input,
-.table>#boxes>.box.dealer button,
-.table>#boxes>.box.dealer select {
+.table #boxes>.box.dealer input,
+.table #boxes>.box.dealer button,
+.table #boxes>.box.dealer select {
 	border-color: #316033;
 }
 
-.table>#boxes>.box.current {
+.table #boxes>.box.current {
 	background-color: #80B145;
 }
-.table>#boxes>.box.current input,
-.table>#boxes>.box.current button,
-.table>#boxes>.box.current select {
+.table #boxes>.box.current input,
+.table #boxes>.box.current button,
+.table #boxes>.box.current select {
 	border-color: #59954A;
 }
 
@@ -61,7 +61,7 @@ input, button, select {
 }*/
 
 .money {
-	color: rgb(120, 70, 70);
+	color: darkgoldenrod;
 }
 
 .♥, .♦ {

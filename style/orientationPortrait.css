@@ -5,11 +5,17 @@
 	flex-direction: column;
 }
 
-.table>#boxes {
+.table .settings {
+	overflow-x: scroll;
+	position: relative;
+	width: 100%;
+}
+
+.table #boxes {
 	overflow-y: auto;
 }
 
-.table>#boxes>.box {
+.table #boxes>.box {
 	min-width: 100%;
 	max-width: 100%;
 }

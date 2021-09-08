@@ -5,12 +5,12 @@
 	flex-direction: row;
 }
 
-.table>#boxes {
+.table #boxes {
 	overflow-x: auto;
 	white-space: nowrap;
 }
 
-.table>#boxes>.box {
+.table #boxes>.box {
 	resize: horizontal;
 	overflow: auto;
 	min-height: 100%;
@@ -19,7 +19,7 @@
 }
 
 @media only screen and (max-width: 50em) {
-	.table>#boxes>.box {
+	.table #boxes>.box {
 		width: 19.5em;
 		min-width: 19.5em;
 	}

@@ -4,15 +4,15 @@
 	background-color: #5E9537;
 }
 
-.table>#boxes>.box {
+.table #boxes>.box {
 	background-color: lightblue;
 }
 
-.table>#boxes>.box.dealer {
+.table #boxes>.box.dealer {
 	background-color: rgb(58, 187, 180);
 }
 
-.table>#boxes>.box.current {
+.table #boxes>.box.current {
 	background-color: lightgreen;
 }
 .hand.current {
