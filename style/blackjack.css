@@ -80,10 +80,7 @@ a {
 	width: 6em;
 }
 
-button.toggle {
-	height: 2em;
-	width: 2em;
-}
+
 
 
 .hands {
@@ -108,6 +105,11 @@ button.toggle {
 	margin: 0;
 	padding: 0;
 }
+
+#table-settings {
+	overflow-x: scroll;
+}
+
 .table>#boxes {
 	flex-grow: 1;
 	margin: 0;
@@ -170,6 +172,11 @@ button.toggle {
 }
 .table {
 	height: calc(100% - 4em);
+}
+
+button.toggle {
+	height: 2em;
+	width: 2em;
 }
 
 }

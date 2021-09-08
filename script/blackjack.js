@@ -883,12 +883,14 @@ class TableTimeouts {
 class Table {
 	constructor(
 			rules = new Rules(), timeouts = new TableTimeouts(),
-			round = 0, phase = Phase.BETTING)
+			round = 0, phase = Phase.BETTING,
+			showCurrentPlayerOnly = false)
 	{
 		this.rules = rules;
 		this.timeouts = timeouts;
 		this.round = round;
 		this.phase = phase;
+		this.showCurrentPlayerOnly = showCurrentPlayerOnly;
 		this.startTime = new Date();
 	}
 
@@ -985,9 +987,18 @@ addPlayerBoxButton.onclick = () =>
 
 
 var tableSettings = createObjectControl(table);
-let tableDiv = document.getElementById("table-info");
+let tableDiv = document.getElementById("table-settings");
 tableDiv.appendChild(tableSettings);
 
+let showCurrentPlayerOnlyInput = document.getElementsByClassName("showCurrentPlayerOnly-input")[0];
+showCurrentPlayerOnlyInput.onclick = e => {
+		document.querySelectorAll(".table>#boxes>.box").forEach(box =>
+			box.style.display = e.target.checked ? "none" : "inline-flex");
+		document.querySelector(".table>#boxes>.box.dealer")
+			.style.display = "inline-flex";
+		document.querySelector(".table>#boxes>.box.current")
+			.style.display = "inline-flex";
+	};
 
 function main()
 {
