@@ -19,6 +19,12 @@ input, button, select {
 #game select {
 	border-color: #447741;
 }
+#game select option {
+	background-color: #316033;
+}
+#game select option:checked {
+    background: #447741 !important;
+}
 
 .table #boxes>.box {
 	background-color: #59954A;
@@ -28,6 +34,13 @@ input, button, select {
 .table #boxes>.box select {
 	border-color: #447741;
 }
+.table #boxes>.box select option {
+	background-color: #59954A;
+}
+.table #boxes>.box select option:checked {
+    background: #447741 !important;
+}
+
 
 .table #boxes>.box.dealer {
 	background-color: #447741;
@@ -37,6 +50,13 @@ input, button, select {
 .table #boxes>.box.dealer select {
 	border-color: #316033;
 }
+.table #boxes>.box.dealer select option {
+	background-color: #447741;
+}
+.table #boxes>.box.dealer select option:checked {
+    background: #316033 !important;
+}
+
 
 .table #boxes>.box.current {
 	background-color: #80B145;
@@ -46,6 +66,13 @@ input, button, select {
 .table #boxes>.box.current select {
 	border-color: #59954A;
 }
+.table #boxes>.box.current select option {
+	background-color: #80B145;
+}
+.table #boxes>.box.current select option:checked {
+    background: #59954A !important;
+}
+
 
 .hand.current {
 	background-color: #97C14B;
@@ -79,8 +106,8 @@ input[type='radio'] {
 }
 
 .table input[type="checkbox"] {
-	width: 0.9em;
-	height: 0.9em;
+	width: 1em;
+	height: 1em;
 	margin: 0;
 	padding: 0;
 }
