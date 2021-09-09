@@ -106,7 +106,7 @@ function setInputValue(input, value)
 }
 
 var createObjectControlCount = 0;
-function createObjectControl(object, datalists, editable = false, displayIcons = { "none": ">", "block": "v" })
+function createObjectControl(object, datalists, displayIcons = { "none": ">", "block": "v" })
 {
 	let div = document.createElement("div");
 
@@ -173,16 +173,38 @@ function createObjectControl(object, datalists, editable = false, displayIcons =
 	let toggleTableButton = document.createElement("button");
 	toggleTableButton.className = "toggle";
 	toggleTableButton.onclick = () =>
-			{
-				propertiesTable.style.display =
-						propertiesTable.style.display == "none" ?
-								"block" : "none";
-				toggleTableButton.innerText = displayIcons[propertiesTable.style.display];
-			};
+		{
+			propertiesTable.style.display =
+					propertiesTable.style.display == "none" ?
+							"block" : "none";
+			toggleTableButton.innerText = displayIcons[propertiesTable.style.display];
+		};
 	propertiesTable.style.display = "none";
 	toggleTableButton.innerText = displayIcons[propertiesTable.style.display];
 
+	
+	/*let copyTableButton = document.createElement("button");
+	copyTableButton.className = "copy";
+	copyTableButton.innerText = "Copy";
+	copyTableButton.onclick = () => {console.log(JSON.stringify(object));
+		localStorage.setItem(object.name, JSON.stringify(object));};
+
+	let pasteTableButton = document.createElement("button");
+	pasteTableButton.className = "paste";
+	pasteTableButton.innerText = "Paste";
+	pasteTableButton.onclick = () => {
+		const objstr = localStorage.getItem(object.name);
+		console.log(JSON.parse(objstr));
+		if (objstr) {
+			const obj = JSON.parse(objstr);
+			object = Object.assign({}, obj);
+			console.log(object);
+		}
+	};*/
+
 	div.appendChild(toggleTableButton);
+	/*div.appendChild(copyTableButton);
+	div.appendChild(pasteTableButton);*/
 	div.appendChild(propertiesTable);
 
 	createObjectControlCount++;
