@@ -291,10 +291,10 @@ class Box {
 
 		this.infoDiv = document.createElement("div");
 		this.infoDiv.innerHTML =
-				"<table class=\"properties\">"+
-					"<tr><td>Bankroll:</td><td><span id=\"bankroll-info\" class=\"money\"></span></td></tr>"+
-					"<tr><td>Running:</td><td id=\"running-count-info\"></td></tr>"+
-				"</table>";
+			"<table class=\"properties\">"+
+				"<tr><td>Bankroll:</td><td><span id=\"bankroll-info\" class=\"money\"></span></td></tr>"+
+				"<tr><td>Running:</td><td id=\"running-count-info\"></td></tr>"+
+			"</table>";
 
 
 		this.HTMLElement = document.createElement("div");
@@ -568,13 +568,15 @@ class Double extends PlayingDecision {
 isLegal()
 {
 	return hasHand2Cards(this.data.hand) &&
-		(!isHandSplit(this.data.hand) || this.data.rules.canDoubleAfterSplit);
+		(!isHandSplit(this.data.hand) ||
+		this.data.rules.canDoubleAfterSplit);
 }
 
 execute()
 {
 	this.data.hand.stake *= 2;
-	this.data.hand.cards.push(drawAndCountCard(this.data.remainingCards, playerBoxes));
+	this.data.hand.cards.push(
+		drawAndCountCard(this.data.remainingCards, playerBoxes));
 	this.data.hand.update();
 	next();
 }
@@ -625,83 +627,28 @@ execute()
 
 
 
-/**
-function hit(hand, box, dealerHand, remainingCards, rules)
-{
-	new Hit(new PlayingDecisionData(rules, hand, box, dealerHand, remainingCards)).make();
-}
-
-
-function stand(hand, box, dealerHand, remainingCards, rules)
-{
-	new Stand(new PlayingDecisionData(rules, hand, box, dealerHand, remainingCards)).make();
-}
-
-
-function double(hand, box, dealerHand, remainingCards, rules)
-{
-	new Double(new PlayingDecisionData(rules, hand, box, dealerHand, remainingCards)).make();
-}
-
-function doubleHit(hand, box, dealerHand, remainingCards, rules)
-{
-	const double = new Double(rules, hand, box, dealerHand, remainingCards);
-	double.isLegal() ? double.make() :
-		new Hit(new PlayingDecisionData(rules, hand, box, dealerHand, remainingCards)).make();
-}
-
-function doubleStand(hand, box, dealerHand, remainingCards, rules)
-{
-	const double = new Double(new PlayingDecisionData(rules, hand, box, dealerHand, remainingCards));
-	double.isLegal() ? double.make() :
-		new Stand(new PlayingDecisionData(rules, hand, box, dealerHand, remainingCards)).make();
-}
-
-function split(hand, box, dealerHand, remainingCards, rules)
-{
-	new Split(new PlayingDecisionData(rules, hand, box, dealerHand, remainingCards)).make();
-}
-
-
-function surrender(hand, box, dealerHand, remainingCards, rules)
-{
-	new Surrender(new PlayingDecisionData(rules, hand, box, dealerHand, remainingCards)).make();
-}
-
-function surrenderHit(hand, box, dealerHand, remainingCards, rules)
-{
-	const surrender = new Surrender(new PlayingDecisionData(rules, hand, box, dealerHand, remainingCards));
-	surrender.isLegal() ? surrender.make() :
-		new Hit(new PlayingDecisionData(rules, hand, box, dealerHand, remainingCards)).make();
-}
-**/
-
-
-
-
-async function autoMove(hand, box, dealerHand, remainingCards, rules)
+async function autoMove(data)
 {
 	next(false);
 	if (phase == Phase.BETTING) {
-		box.bettingStrategy(rules)(box, rules);
+		data.box.bettingStrategy(data.rules)(data.box, data.rules);
 	}
-	else if(phase == Phase.PLAYING) {
-		await autoPlay(box, hand, dealerHand, remainingCards, rules);
+	else if (phase == Phase.PLAYING) {
+		await autoPlay(data);
 	}
 	next();
 }
 
-function autoStep(hand, box, dealerHand, remainingCards, rules)
+function autoStep(data)
 {
 	next(false);
 	if (phase == Phase.BETTING) {
-		box.bettingStrategy(rules)(box, rules);
+		data.box.bettingStrategy(data.rules)(data.box, data.rules);
 		next();
 	}
-	else if(phase == Phase.PLAYING) {
-		box.playingStrategy(new PlayingDecisionData(rules, hand, box, dealerHand, remainingCards)).make();
+	else if (phase == Phase.PLAYING) {
+		data.box.playingStrategy(data).make();
 	}
-	
 }
 
 
@@ -731,11 +678,11 @@ const Phases = [
 function countCard(card, boxes)
 {
 	boxes.map(box =>
-			{
-				if (box.countingStrategy)
-					box.runningCount += box.countingStrategy(card);
-				box.update();
-			});
+		{
+			if (box.countingStrategy)
+				box.runningCount += box.countingStrategy(card);
+			box.update();
+		});
 }
 
 function drawAndCountCard(cards, boxes)
@@ -769,18 +716,21 @@ async function dealing(box, remainingCards, rules)
 {
 	await waitFor(box.timeouts.deal);
 	box.clearHands();
-	if (box.stake >= rules.limits.min && box.stake <= rules.limits.max) {
-		box.hands = [new Hand([drawAndCountCard(remainingCards, playerBoxes), drawAndCountCard(remainingCards, playerBoxes)], box.stake)];
+	if (box.stake >= rules.limits.min &&
+		box.stake <= rules.limits.max) {
+		box.hands = [new Hand(
+			[drawAndCountCard(remainingCards, playerBoxes),
+			drawAndCountCard(remainingCards, playerBoxes)],
+			box.stake)];
 		box.update();
 	}
 }
 
-function enablePlayingButtons(hand, rules)
+function enablePlayingButtons(data)
 {
 	let playingInput = document.getElementById("playing-input");
 	playingInput.classList.remove("disabled");
-
-	const data = new PlayingDecisionData(rules, hand, false);
+	
 	new Hit(data).updateButton();
 	new Stand(data).updateButton();
 	new Double(data).updateButton();
@@ -794,38 +744,39 @@ function disablePlayingButtons()
 	playingInput.classList.add("disabled");
 }
 
-async function autoPlay(box, hand, dealerHand, remainingCards, rules)
+async function autoPlay(data)
 {
-	while(!(nextFlag || isHandValue21(hand))) {
-		await waitFor(box.timeouts.autoPlay);
-		box.playingStrategy(new PlayingDecisionData(rules, hand, box, dealerHand, remainingCards)).make();
+	while (!(nextFlag || isHandValue21(data.hand))) {
+		await waitFor(data.box.timeouts.autoPlay);
+		data.box.playingStrategy(data).make();
 	}
 }
 
-async function manuPlay(box, hand, dealerHand, remainingCards, rules)
+async function manuPlay(data)
 {
-	enablePlayingButtons(hand, rules);
-	await waitUntil(() => nextFlag || isHandValue21(hand));
+	enablePlayingButtons(data);
+	await waitUntil(() => nextFlag || isHandValue21(data.hand));
 	disablePlayingButtons();
 }
 
 async function playing(box, dealerHand, remainingCards, rules)
 {
-	for (handI = 0; handI < box.hands.length; handI++) {
-		var hand = box.hands[handI];
+	for (table.current.hand of box.hands) {
 
-		hand.HTMLElement.classList.add("current");
-		while (hand.cards.length < 2) {
-			new Hit(new PlayingDecisionData(rules, hand, box, dealerHand, remainingCards)).execute();
+		table.current.hand.HTMLElement.classList.add("current");
+
+		const data = new PlayingDecisionData(
+			rules, table.current.hand, box, dealerHand, remainingCards);
+
+		while (table.current.hand.cards.length < 2) {
+			new Hit(data).execute();
 		}
 		next(false);
-		if (box.autoPlay && box.playingStrategy) {
-			await autoPlay(box, hand, dealerHand, remainingCards, rules);
-		}
-		else {
-			await manuPlay(box, hand, dealerHand, remainingCards, rules);
-		}
-		hand.HTMLElement.classList.remove("current");
+		
+		await (box.autoPlay && box.playingStrategy ? 
+			autoPlay : manuPlay)(data);
+		
+			table.current.hand.HTMLElement.classList.remove("current");
 	}
 }
 
@@ -842,13 +793,13 @@ function isHandBustOrLess(hand, hand2)
 
 function payout(hand, dealerHand, rules)
 {
-	return	isHandOnlyNatural(hand, dealerHand) ?
-				rules.payouts.natural :
-			isHandBustOrLess(hand, dealerHand) ?
-				rules.payouts.loss :
-			isHandBustOrLess(dealerHand, hand) ?
-				rules.payouts.win :
-				rules.payouts.push;
+	return isHandOnlyNatural(hand, dealerHand) ?
+			rules.payouts.natural :
+		isHandBustOrLess(hand, dealerHand) ?
+			rules.payouts.loss :
+		isHandBustOrLess(dealerHand, hand) ?
+			rules.payouts.win :
+			rules.payouts.push;
 }
 
 function moveMoney(profit, box, dealerBox)
@@ -873,7 +824,7 @@ async function showdown(box, dealerBox, rules)
 
 function isCutCardReached(table)
 {
-	return remainingCards.length <= (1 - table.rules.deckPenetration) * 52 * table.rules.numDecks;
+	return table.remainingCards.length <= (1 - table.rules.deckPenetration) * 52 * table.rules.numDecks;
 }
 
 function dealingDealer(playerBoxes, dealerBox, remainingCards)
@@ -885,7 +836,7 @@ function dealingDealer(playerBoxes, dealerBox, remainingCards)
 function playingDealer(dealerBox, remainingCards)
 {
 	next(false);
-	while(!nextFlag) {
+	while (!nextFlag) {
 		dealerBox.playingStrategy(new PlayingDecisionData(table.rules, dealerBox.hands[0], dealerBox, dealerBox.hands[0], remainingCards)).make();
 	}
 }
@@ -895,50 +846,46 @@ async function showdownDealer(table)
 	await waitFor(table.timeouts.betweenRounds);
 	if (isCutCardReached(table)) {
 		resetRunningCounts(playerBoxes);
-		remainingCards = freshShuffledDecks(table.rules.numDecks);
+		table.remainingCards = freshShuffledDecks(table.rules.numDecks);
 		await waitFor(table.timeouts.shuffling);
 	}
 }
 
 async function start(table)
 {
-	for (table.round = 0; table.round < table.rules.numRounds; table.round++) {
+	for (table.current.round = 0; table.current.round < table.rules.numRounds; table.current.round++) {
 		
-		/*let roundsPerMinuteDiv = document.getElementById("rounds-per-minute");
-		roundsPerMinuteDiv.innerHTML = "roundsPerMinute: "+table.roundsPerMinute();*/
 		console.log("roundsPerMinute: "+table.roundsPerMinute());
 
 		for (phase = Phase.BETTING; phase <= Phase.SHOWDOWN; phase++) {
 
-			for (boxI = 0; boxI < playerBoxes.length; boxI++) {
-				var box = playerBoxes[boxI];
-
-				box.HTMLElement.classList.add("current");
+			for (table.current.box of playerBoxes) {
+				table.current.box.HTMLElement.classList.add("current");
 				switch (phase) {
 				case Phase.BETTING:
-					await betting(box, table.rules);
+					await betting(table.current.box, table.rules);
 					break;
 				case Phase.DEALING:
-					await dealing(box, remainingCards, table.rules);
+					await dealing(table.current.box, table.remainingCards, table.rules);
 					break;
 				case Phase.PLAYING:
-					await playing(box, dealerBox.hands[0], remainingCards, table.rules);
+					await playing(table.current.box, dealerBox.hands[0], table.remainingCards, table.rules);
 					break;
 				case Phase.SHOWDOWN:
-					await showdown(box, dealerBox, table.rules);
+					await showdown(table.current.box, dealerBox, table.rules);
 					break;
 				}
-				box.HTMLElement.classList.remove("current");
-				box.update();
+				table.current.box.HTMLElement.classList.remove("current");
+				table.current.box.update();
 			}
 			
 			dealerBox.HTMLElement.classList.add("current");
 			switch (phase) {
 			case Phase.DEALING:
-				dealingDealer(playerBoxes, dealerBox, remainingCards);
+				dealingDealer(playerBoxes, dealerBox, table.remainingCards);
 				break;
 			case Phase.PLAYING:
-				playingDealer(dealerBox, remainingCards);
+				playingDealer(dealerBox, table.remainingCards);
 				break;
 			case Phase.SHOWDOWN:
 				await showdownDealer(table);
@@ -950,6 +897,112 @@ async function start(table)
 }
 
 
+
+
+
+
+function initInput(table)
+{
+	let stakeInput = document.getElementById("stake");
+	/*stakeInput.min = table.rules.limits.min;
+	stakeInput.max = table.rules.limits.max;
+	stakeInput.placeholder = table.rules.limits.min+"<x<"+table.rules.limits.max;*/
+	stakeInput.value = table.rules.limits.min;
+
+	let placeBetButton = document.getElementById("place-bet-button");
+	placeBetButton.onclick = () => placeBetOnClick(
+		table.current.box, table.rules);
+
+	const data = () => table.playingDecisionData();
+
+	let hitButton = document.getElementById("Hit-button");
+	hitButton.onclick = () => new Hit(data()).make();
+
+	let standButton = document.getElementById("Stand-button");
+	standButton.onclick = () => new Stand(data()).make();
+
+	let doubleButton = document.getElementById("Double-button");
+	doubleButton.onclick = () => new Double(data()).make();
+
+	let splitButton = document.getElementById("Split-button");
+	splitButton.onclick = () => new Split(data()).make();
+
+	let surrenderButton = document.getElementById("Surrender-button");
+	surrenderButton.onclick = () => new Surrender(data()).make();
+
+	let nextButton = document.getElementById("next-button");
+	nextButton.onclick = next;
+
+	let autoMoveButton = document.getElementById("auto-move-button");
+	autoMoveButton.onclick = () => autoMove(table.playingDecisionData());
+
+	let autoStepButton = document.getElementById("auto-step-button");
+	autoStepButton.onclick = () => autoStep(table.playingDecisionData());
+
+	disablePlayingButtons();
+}
+
+
+function initAddPlayerBoxButton()
+{
+	let addPlayerBoxButton =
+		document.getElementById("add-player-box-button");
+	addPlayerBoxButton.onclick = () =>
+		{
+			let player = new Player(10000);
+			playerBoxes.push(new Box(player, boxesDiv,
+				flatBettingStrategyMin(table.rules),
+				debug ? true : false, false,
+				basicStrategy, debug ? true : false, true,
+				hiLoCountingStrategy));
+		}
+}
+
+
+function initTableSettings()
+{
+	var tableSettings = createObjectControl(table);
+	let tableDiv = document.getElementById("table-settings");
+	tableDiv.appendChild(tableSettings);
+
+	let showCurrentPlayerOnlyInput =
+		document.getElementsByClassName("showCurrentPlayerOnly-input")[0];
+	showCurrentPlayerOnlyInput.onclick = e =>
+		{
+			document.querySelectorAll(".table>#boxes>.box").forEach(
+				box => box.style.display = e.target.checked ?
+					"none" : "inline-flex");
+			document.querySelector(".table>#boxes>.box.dealer")
+				.style.display = "inline-flex";
+			document.querySelector(".table>#boxes>.box.current")
+				.style.display = "inline-flex";
+		};
+}
+
+
+
+
+var boxesDiv = document.getElementById("boxes");
+
+
+var dealer = new Player(0);
+var dealerBox = new Box(
+	dealer, boxesDiv,
+	undefined, false, false,
+	dealerS17Strategy, true, false);
+
+dealerBox.HTMLElement.classList.add("dealer");
+
+
+var player = new Player(10000);
+var playerBoxes = [new Box(
+	player, boxesDiv,
+	flatBettingStrategy(10),
+	debug ? true : false, false,
+	basicStrategy, debug ? true : false, true,
+	hiLoCountingStrategy)];
+
+
 class TableTimeouts {
 	constructor(betweenRounds = 0, shuffling = 0)
 	{
@@ -958,129 +1011,71 @@ class TableTimeouts {
 	}
 }
 
+class TableState {
 
-class Table {
+constructor()
+{
+	this.round = 0;
+	this.phase = Phase.BETTING;
+	this.box = undefined;
+	this.hand = undefined;
+}
+
+}
+
+class Timer {
+
+constructor()
+{
+	this.startTime = new Date();
+}
+
+time()
+{
+	return new Date() - this.startTime;
+}
+
+}
+
+class Table extends Timer {
 	constructor(
-			rules = new Rules(), timeouts = new TableTimeouts(),
-			round = 0, phase = Phase.BETTING,
-			showCurrentPlayerOnly = false)
+		rules = new Rules(), timeouts = new TableTimeouts(),
+		showCurrentPlayerOnly = false,
+		current = new TableState())
 	{
+		super();
 		this.rules = rules;
 		this.timeouts = timeouts;
-		this.round = round;
-		this.phase = phase;
 		this.showCurrentPlayerOnly = showCurrentPlayerOnly;
-		this.startTime = new Date();
-	}
-
-	time()
-	{
-		return new Date() - this.startTime;
+		this.current = current;
+		this.remainingCards = freshShuffledDecks(this.rules.numDecks);
 	}
 
 	roundsPerMinute()
 	{
-		return this.round / (this.time()/1000/60);
+		return this.current.round / (this.time()/1000/60);
+	}
+
+	playingDecisionData()
+	{
+		return new PlayingDecisionData(
+			this.rules, this.current.hand, this.current.box,
+			dealerBox.hands[0], this.remainingCards);
 	}
 }
 
 var table = new Table();
 
-
-var boxesDiv = document.getElementById("boxes");
-
-var dealer = new Player(0);
-var dealerBox = new Box(dealer, boxesDiv,
-		undefined, false, false,
-		dealerS17Strategy, true, false);
-dealerBox.HTMLElement.classList.add("dealer");
-
-var player = new Player(10000);
-var playerBoxes = [
-		new Box(player, boxesDiv,
-				flatBettingStrategyMin(table.rules), debug ? true : false, false,
-				basicStrategy, debug ? true : false, true,
-				hiLoCountingStrategy)];
-
-
-var boxI = 0;
-var handI = 0;
-
-
-var remainingCards = freshShuffledDecks(6);
-var phase = Phase.BETTING;
-
-
-
-
-
-
-let stakeInput = document.getElementById("stake");
-/*stakeInput.min = table.rules.limits.min;
-stakeInput.max = table.rules.limits.max;
-stakeInput.placeholder = table.rules.limits.min+"<x<"+table.rules.limits.max;*/
-stakeInput.value = table.rules.limits.min;
-
-let placeBetButton = document.getElementById("place-bet-button");
-placeBetButton.onclick = () => placeBetOnClick(playerBoxes[boxI], table.rules);
-
-let hitButton = document.getElementById("Hit-button");
-hitButton.onclick = () => new Hit(new PlayingDecisionData(table.rules, playerBoxes[boxI].hands[handI], playerBoxes[boxI], dealerBox.hands[0], remainingCards)).make();
-
-let standButton = document.getElementById("Stand-button");
-standButton.onclick = () => new Stand(new PlayingDecisionData(table.rules, playerBoxes[boxI].hands[handI], playerBoxes[boxI], dealerBox.hands[0], remainingCards)).make();
-
-let doubleButton = document.getElementById("Double-button");
-doubleButton.onclick = () => new Double(new PlayingDecisionData(table.rules, playerBoxes[boxI].hands[handI], playerBoxes[boxI], dealerBox.hands[0], remainingCards)).make();
-
-let splitButton = document.getElementById("Split-button");
-splitButton.onclick = () => new Split(new PlayingDecisionData(table.rules, playerBoxes[boxI].hands[handI], playerBoxes[boxI], dealerBox.hands[0], remainingCards)).make();
-
-let surrenderButton = document.getElementById("Surrender-button");
-surrenderButton.onclick = () => new Surrender(new PlayingDecisionData(table.rules, playerBoxes[boxI].hands[handI], playerBoxes[boxI], dealerBox.hands[0], remainingCards)).make();
-
-let nextButton = document.getElementById("next-button");
-nextButton.onclick = next;
-
-let autoMoveButton = document.getElementById("auto-move-button");
-autoMoveButton.onclick = () => autoMove(playerBoxes[boxI].hands[handI], playerBoxes[boxI], dealerBox.hands[0], remainingCards, table.rules);
-
-let autoStepButton = document.getElementById("auto-step-button");
-autoStepButton.onclick = () => autoStep(playerBoxes[boxI].hands[handI], playerBoxes[boxI], dealerBox.hands[0], remainingCards, table.rules);
-
-
-disablePlayingButtons();
-
-
-let addPlayerBoxButton = document.getElementById("add-player-box-button");
-addPlayerBoxButton.onclick = () =>
-		{
-			let player = new Player(10000);
-			playerBoxes.push(
-					new Box(player, boxesDiv,
-							flatBettingStrategyMin(table.rules), debug ? true : false, false,
-							basicStrategy, debug ? true : false, true,
-							hiLoCountingStrategy));
-		}
-
-
-
-var tableSettings = createObjectControl(table);
-let tableDiv = document.getElementById("table-settings");
-tableDiv.appendChild(tableSettings);
-
-let showCurrentPlayerOnlyInput = document.getElementsByClassName("showCurrentPlayerOnly-input")[0];
-showCurrentPlayerOnlyInput.onclick = e => {
-		document.querySelectorAll(".table>#boxes>.box").forEach(box =>
-			box.style.display = e.target.checked ? "none" : "inline-flex");
-		document.querySelector(".table>#boxes>.box.dealer")
-			.style.display = "inline-flex";
-		document.querySelector(".table>#boxes>.box.current")
-			.style.display = "inline-flex";
-	};
+function init(table)
+{
+	initInput(table);
+	initAddPlayerBoxButton();
+	initTableSettings();
+}
 
 function main()
 {
+	init(table);
 	start(table);
 }
 main();
