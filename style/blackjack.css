@@ -138,7 +138,7 @@ a {
 
 .hands {
 	display: inline-flex;
-	min-height: 12em;
+	min-height: 12.5em;
 	white-space: nowrap;
 	width: 100%;
 	max-width: 100%;

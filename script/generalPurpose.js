@@ -163,7 +163,7 @@ function createObjectControl(object, datalists, editable = false, displayIcons =
 			}
 			propertyValue.id = "table"+createObjectControlCount+"-"+p+"-input";
 			propertyValue.className = p+"-input";
-		}	
+		}
 		propertyTD2.appendChild(propertyValue);
 		propertyTR.appendChild(propertyTD1);
 		propertyTR.appendChild(propertyTD2);

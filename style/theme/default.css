@@ -67,3 +67,24 @@ input, button, select {
 .♥, .♦ {
 	color: #990000;
 }
+
+@supports(-webkit-appearance: none) or (-moz-appearance: none) {
+
+input[type='checkbox'],
+input[type='radio'] {
+	-webkit-appearance: none;
+	-moz-appearance: none;
+}
+
+}
+
+.table input[type="checkbox"] {
+	width: 0.9em;
+	height: 0.9em;
+	margin: 0;
+	padding: 0;
+}
+
+.table input[type="checkbox"]:checked {
+	background-color: white;
+}
