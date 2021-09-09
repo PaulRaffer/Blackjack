@@ -1,7 +1,7 @@
 // Copyright (c) 2021 Paul Raffer
 
 
-const debug = true;
+const debug = false;
 
 
 const PlayerDecision = [ hit, stand, double, split, surrender ]
@@ -207,7 +207,7 @@ class Rules {
 			canDoubleAfterSplit = true,
 			canSplitSameRankOnly = false,
 			canResplitAces = true,
-			canHitSplitAces = debug ? true : false,
+			canHitSplitAces = false,
 			canSurrender = false,
 			europeanHoleCard = true)
 	{
@@ -625,7 +625,7 @@ execute()
 
 
 
-
+/**
 function hit(hand, box, dealerHand, remainingCards, rules)
 {
 	new Hit(new PlayingDecisionData(rules, hand, box, dealerHand, remainingCards)).make();
@@ -674,7 +674,7 @@ function surrenderHit(hand, box, dealerHand, remainingCards, rules)
 	surrender.isLegal() ? surrender.make() :
 		new Hit(new PlayingDecisionData(rules, hand, box, dealerHand, remainingCards)).make();
 }
-
+**/
 
 
 
