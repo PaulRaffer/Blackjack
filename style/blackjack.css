@@ -103,6 +103,7 @@ a {
 
 .table .settings {
 	flex-shrink: 0;
+	overflow: auto;
 }
 
 .table #boxes {
