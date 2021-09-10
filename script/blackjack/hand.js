@@ -195,3 +195,15 @@ function isHandSplit(hand)
 {
 	return hand.resplitCount > 0;
 }
+
+
+
+function isHandOnlyNatural(hand, hand2)
+{
+	return isHandNatural(hand) && !isHandNatural(hand2);
+}
+
+function isHandBustOrLess(hand, hand2)
+{
+	return isHandBust(hand) || bestHandValue(hand) < bestHandValue(hand2);
+}

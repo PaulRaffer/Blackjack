@@ -31,48 +31,7 @@ const rankValues = {
 
 
 
-class Payouts {
 
-	constructor(win = 1, loss = -1, push = 0, natural = 3/2)
-	{
-		this.win = win;
-		this.loss = loss;
-		this.push = push;
-		this.natural = natural;
-	}
-
-}
-
-
-class Rules {
-
-	constructor(
-		limits = { min: 10, max: 100 },
-		payouts = new Payouts(), numRounds = Infinity,
-		numDecks = 6, deckPenetration = .75,
-		resplitLimit = Infinity,
-		canDoubleAfterSplit = true,
-		canSplitSameRankOnly = false,
-		canResplitAces = true,
-		canHitSplitAces = false,
-		canSurrender = false,
-		europeanHoleCard = true)
-	{
-		this.limits = limits;
-		this.payouts = payouts;
-		this.numRounds = numRounds;
-		this.numDecks = numDecks;
-		this.deckPenetration = deckPenetration;
-		this.resplitLimit = resplitLimit;
-		this.canDoubleAfterSplit = canDoubleAfterSplit;
-		this.canSplitSameRankOnly = canSplitSameRankOnly;
-		this.canResplitAces = canResplitAces;
-		this.canHitSplitAces = canHitSplitAces;
-		this.canSurrender = canSurrender;
-		this.europeanHoleCard = europeanHoleCard;
-	}
-
-}
 
 
 
@@ -127,12 +86,7 @@ function autoStep(data)
 
 
 
-const Phase = {
-	BETTING: new Box().bet_,
-	DEALING: new Box().deal_,
-	PLAYING: new Box().play_,
-	SHOWDOWN: new Box().showdown_,
-};
+
 
 
 
@@ -189,15 +143,7 @@ async function manuPlay(data)
 
 
 
-function isHandOnlyNatural(hand, hand2)
-{
-	return isHandNatural(hand) && !isHandNatural(hand2);
-}
 
-function isHandBustOrLess(hand, hand2)
-{
-	return isHandBust(hand) || bestHandValue(hand) < bestHandValue(hand2);
-}
 
 function payout(hand, dealerHand, rules)
 {
@@ -222,14 +168,14 @@ function moveMoney(profit, box, dealerBox)
 function isCutCardReached(table)
 {
 	return table.remainingCards.length <=
-		(1 - table.rules.deckPenetration) * 52 * table.rules.numDecks;
+		(1 - table.settings.rules.deckPenetration) * 52 * table.settings.rules.numDecks;
 }
 
 
 
 async function start(table)
 {
-	for (table.current.round = 0; table.current.round < table.rules.numRounds; table.current.round++) {
+	for (table.current.round = 0; table.current.round < table.settings.rules.numRounds; table.current.round++) {
 		
 		console.log("roundsPerMinute: "+table.roundsPerMinute());
 
@@ -252,11 +198,11 @@ async function start(table)
 function initInput(table)
 {
 	let stakeInput = document.getElementById("stake");
-	stakeInput.value = table.rules.limits.min;
+	stakeInput.value = table.settings.rules.limits.min;
 
 	let placeBetButton = document.getElementById("place-bet-button");
 	placeBetButton.onclick = () => placeBetOnClick(
-		table.current.box, table.rules);
+		table.current.box, table.settings.rules);
 
 	const data = () => table.playingDecisionData();
 
@@ -288,7 +234,7 @@ function initInput(table)
 }
 
 
-function initAddPlayerBoxButton()
+function initAddPlayerBoxButton(table)
 {
 	let addPlayerBoxButton =
 		document.getElementById("add-player-box-button");
@@ -308,7 +254,7 @@ function initAddPlayerBoxButton()
 }
 
 
-function initTableSettings()
+function initTableSettings(table)
 {
 	var tableSettings = createObjectControl(table);
 	let tableDiv = document.getElementById("table-settings");
@@ -357,65 +303,6 @@ new BoxView(defaultDealerBox, boxesDiv);
 new BoxView(defaultPlayerBox, boxesDiv);
 
 
-class TableTimeouts {
-
-	constructor(betweenRounds = 0, shuffling = 0)
-	{
-		this.betweenRounds = betweenRounds;
-		this.shuffling = shuffling;
-	}
-
-}
-
-class TableState {
-
-	constructor()
-	{
-		this.round = 0;
-		this.phase = Phase.BETTING;
-		this.box = undefined;
-		this.hand = undefined;
-	}
-
-}
-
-
-
-
-
-
-
-class Table extends Timer {
-
-	constructor(
-		rules = new Rules(), timeouts = new TableTimeouts(),
-		showCurrentPlayerOnly = false,
-		dealerBox = defaultDealerBox, playerBoxes = defaultPlayerBoxes,
-		current = new TableState())
-	{
-		super();
-		this.rules = rules;
-		this.timeouts = timeouts;
-		this.showCurrentPlayerOnly = showCurrentPlayerOnly;
-		this.dealerBox = dealerBox;
-		this.playerBoxes = playerBoxes;
-		this.current = current;
-		this.remainingCards = freshShuffledDecks(this.rules.numDecks);
-	}
-
-	roundsPerMinute()
-	{
-		return this.current.round / (this.time()/1000/60);
-	}
-
-	playingDecisionData()
-	{
-		return new PlayingDecisionData(
-			this.rules, this.current.hand, this.current.box,
-			this.dealerBox.hands[0], this.remainingCards);
-	}
-
-}
 
 
 var table = new Table();
@@ -423,8 +310,8 @@ var table = new Table();
 function init(table)
 {
 	initInput(table);
-	initAddPlayerBoxButton();
-	initTableSettings();
+	initAddPlayerBoxButton(table);
+	initTableSettings(table);
 }
 
 function main()

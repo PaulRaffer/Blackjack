@@ -56,6 +56,14 @@ class Box {
 	async showdown_(table) { return this.showdown(table); }
 }
 
+const Phase = {
+	BETTING: new Box().bet_,
+	DEALING: new Box().deal_,
+	PLAYING: new Box().play_,
+	SHOWDOWN: new Box().showdown_,
+};
+
+
 class PlayerBox extends Box {
 
 	async bet(table)
@@ -63,7 +71,7 @@ class PlayerBox extends Box {
 		next(false);
 		if (this.autoBet && this.bettingStrategy) {
 			await waitFor(this.timeouts.autoBet);
-			this.bettingStrategy(table.rules)(this, table.rules);
+			this.bettingStrategy(table.settings.rules)(this, table.settings.rules);
 		}
 		else {
 			let bettingInput = document.getElementById("betting-input");
@@ -78,8 +86,8 @@ class PlayerBox extends Box {
 	async deal(table)
 	{
 		await waitFor(this.timeouts.deal);
-		if (this.stake >= table.rules.limits.min &&
-			this.stake <= table.rules.limits.max) {
+		if (this.stake >= table.settings.rules.limits.min &&
+			this.stake <= table.settings.rules.limits.max) {
 			this.hands = [new Hand(
 				[drawAndCountCard(table.remainingCards, table.playerBoxes),
 				drawAndCountCard(table.remainingCards, table.playerBoxes)],
@@ -115,7 +123,7 @@ class PlayerBox extends Box {
 			table.current.hand.setCurrent(true);
 	
 			const profit = table.current.hand.stake *
-				payout(table.current.hand, dealerHand, table.rules);
+				payout(table.current.hand, dealerHand, table.settings.rules);
 			moveMoney(profit, this, table.dealerBox);
 	
 			table.current.hand.setCurrent(false);
@@ -143,19 +151,19 @@ class DealerBox extends Box {
 		next(false);
 		while (!nextFlag) {
 			table.current.box.playingStrategy(new PlayingDecisionData(
-				table.rules, table.current.box.hands[0], table.current.box,
+				table.settings.rules, table.current.box.hands[0], table.current.box,
 				table.current.box.hands[0], table.remainingCards)).make();
 		}
 	}
 	
 	async showdown(table)
 	{
-		await waitFor(table.timeouts.betweenRounds);
+		await waitFor(table.settings.timeouts.betweenRounds);
 		if (isCutCardReached(table)) {
 			resetRunningCounts(table.playerBoxes);
 			table.remainingCards =
-				freshShuffledDecks(table.rules.numDecks);
-			await waitFor(table.timeouts.shuffling);
+				freshShuffledDecks(table.settings.rules.numDecks);
+			await waitFor(table.settings.timeouts.shuffling);
 		}
 	}
 
@@ -191,7 +199,7 @@ constructor(box, htmlParentElement)
 		"</table>";
 
 
-	this.htmlElement.className = "box";
+	this.htmlElement.classList.add("box");
 	if (box.constructor == DealerBox)
 		this.htmlElement.classList.add("dealer");
 
