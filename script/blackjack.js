@@ -25,25 +25,27 @@ const rankValues = {
 
 
 class Hand {
-	constructor(cards = [], stake = 0, resplitCount = 0)
-	{
-		this.HTMLElement = document.createElement("div");
-		this.HTMLElement.className = "hand";
-		this.cards = cards;
-		this.stake = stake;
-		this.resplitCount = resplitCount;
-	}
 
-	update()
-	{
-		const value = cardsValues(this.cards);
-		this.HTMLElement.innerHTML =
-				cardsToString(this.cards) +
-				"<table class=\"properties\">"+
-					"<tr><td>Value:</td><td>"+value+ (value.every(v => v > 21) ? " (Bust)" : "") +"</td></tr>"+
-					"<tr><td>Stake:</td><td>"+moneyToString(this.stake)+"</td></tr>"+
-				"</table>";
-	}
+constructor(cards = [], stake = 0, resplitCount = 0)
+{
+	this.HTMLElement = document.createElement("div");
+	this.HTMLElement.className = "hand";
+	this.cards = cards;
+	this.stake = stake;
+	this.resplitCount = resplitCount;
+}
+
+update()
+{
+	const value = cardsValues(this.cards);
+	this.HTMLElement.innerHTML =
+			cardsToString(this.cards) +
+			"<table class=\"properties\">"+
+				"<tr><td>Value:</td><td>"+value+ (value.every(v => v > 21) ? " (Bust)" : "") +"</td></tr>"+
+				"<tr><td>Stake:</td><td>"+moneyToString(this.stake)+"</td></tr>"+
+			"</table>";
+}
+
 }
 
 
@@ -189,59 +191,68 @@ function isHandSplit(hand)
 
 
 class Payouts {
-	constructor(win = 1, loss = -1, push = 0, natural = 3/2)
-	{
-		this.win = win;
-		this.loss = loss;
-		this.push = push;
-		this.natural = natural;
-	}
+
+constructor(win = 1, loss = -1, push = 0, natural = 3/2)
+{
+	this.win = win;
+	this.loss = loss;
+	this.push = push;
+	this.natural = natural;
+}
+
 }
 
 
 class Rules {
-	constructor(
-			limits = { min: 10, max: 100 }, payouts = new Payouts(), numRounds = Infinity,
-			numDecks = 6, deckPenetration = .75,
-			resplitLimit = Infinity,
-			canDoubleAfterSplit = true,
-			canSplitSameRankOnly = false,
-			canResplitAces = true,
-			canHitSplitAces = false,
-			canSurrender = false,
-			europeanHoleCard = true)
-	{
-		this.limits = limits;
-		this.payouts = payouts;
-		this.numRounds = numRounds;
-		this.numDecks = numDecks;
-		this.deckPenetration = deckPenetration;
-		this.resplitLimit = resplitLimit;
-		this.canDoubleAfterSplit = canDoubleAfterSplit;
-		this.canSplitSameRankOnly = canSplitSameRankOnly;
-		this.canResplitAces = canResplitAces;
-		this.canHitSplitAces = canHitSplitAces;
-		this.canSurrender = canSurrender;
-		this.europeanHoleCard = europeanHoleCard;
-	}
+
+constructor(
+		limits = { min: 10, max: 100 },
+		payouts = new Payouts(), numRounds = Infinity,
+		numDecks = 6, deckPenetration = .75,
+		resplitLimit = Infinity,
+		canDoubleAfterSplit = true,
+		canSplitSameRankOnly = false,
+		canResplitAces = true,
+		canHitSplitAces = false,
+		canSurrender = false,
+		europeanHoleCard = true)
+{
+	this.limits = limits;
+	this.payouts = payouts;
+	this.numRounds = numRounds;
+	this.numDecks = numDecks;
+	this.deckPenetration = deckPenetration;
+	this.resplitLimit = resplitLimit;
+	this.canDoubleAfterSplit = canDoubleAfterSplit;
+	this.canSplitSameRankOnly = canSplitSameRankOnly;
+	this.canResplitAces = canResplitAces;
+	this.canHitSplitAces = canHitSplitAces;
+	this.canSurrender = canSurrender;
+	this.europeanHoleCard = europeanHoleCard;
+}
+
 }
 
 
 class Player {
-	constructor(bankroll)
-	{
-		this.bankroll = bankroll;
-	}
+
+constructor(bankroll)
+{
+	this.bankroll = bankroll;
+}
+
 }
 
 class BoxTimeouts {
-	constructor(autoBet = 0, deal = 0, autoPlay = 0, showdown = 0)
-	{
-		this.autoBet = autoBet;
-		this.deal = deal;
-		this.autoPlay = autoPlay;
-		this.showdown = showdown;
-	}
+
+constructor(autoBet = 0, deal = 0, autoPlay = 0, showdown = 0)
+{
+	this.autoBet = autoBet;
+	this.deal = deal;
+	this.autoPlay = autoPlay;
+	this.showdown = showdown;
+}
+
 }
 
 const strategies = {
@@ -251,86 +262,88 @@ const strategies = {
 };
 
 class Box {
-	static count = 0;
 
-	constructor(
-			player, htmlParentElement,
-			bettingStrategy, autoBet = false, warnOnBettingError = false,
-			playingStrategy, autoPlay = false, warnOnPlayingError = false,
-			countingStrategy,
-			timeouts = new BoxTimeouts(),
-			runningCount = 0,
-			hands = [], stake = 0, id = Box.count++)
+static count = 0;
+
+constructor(
+		player, htmlParentElement,
+		bettingStrategy, autoBet = false, warnOnBettingError = false,
+		playingStrategy, autoPlay = false, warnOnPlayingError = false,
+		countingStrategy,
+		timeouts = new BoxTimeouts(),
+		runningCount = 0,
+		hands = [], stake = 0, id = Box.count++)
+{
+	this.player = player;
+	this.bettingStrategy = bettingStrategy;
+	this.autoBet = autoBet;
+	this.warnOnBettingError = warnOnBettingError;
+	this.playingStrategy = playingStrategy;
+	this.autoPlay = autoPlay;
+	this.warnOnPlayingError = warnOnPlayingError;
+	this.countingStrategy = countingStrategy;
+	this.timeouts = timeouts;
+	this.runningCount = runningCount;
+	this.hands = hands;
+	this.stake = stake;
+	this.id = id;
+	
+
+	let propertiesTable = createObjectControl(this, strategies);
+	
+	this.settingsDiv = document.createElement("div");
+	this.settingsDiv.id = "box"+id+"-info";
+	this.settingsDiv.className = "box-info";
+
+	this.settingsDiv.appendChild(propertiesTable);
+
+
+	this.handsDiv = document.createElement("div");
+	this.handsDiv.className = "hands";
+
+	this.infoDiv = document.createElement("div");
+	this.infoDiv.innerHTML =
+		"<table class=\"properties\">"+
+			"<tr><td>Bankroll:</td><td><span id=\"bankroll-info\" class=\"money\"></span></td></tr>"+
+			"<tr><td>Running:</td><td id=\"running-count-info\"></td></tr>"+
+		"</table>";
+
+
+	this.HTMLElement = document.createElement("div");
+	htmlParentElement.appendChild(this.HTMLElement);
+	this.HTMLElement.className = "box";
+
+	this.HTMLElement.innerHTML = "";
+	this.HTMLElement.appendChild(this.handsDiv);
+	this.HTMLElement.appendChild(this.infoDiv);
+	this.HTMLElement.appendChild(this.settingsDiv);
+
+	this.update();
+}
+
+clearHands()
+{
+	this.hands.forEach(hand =>
 	{
-		this.player = player;
-		this.bettingStrategy = bettingStrategy;
-		this.autoBet = autoBet;
-		this.warnOnBettingError = warnOnBettingError;
-		this.playingStrategy = playingStrategy;
-		this.autoPlay = autoPlay;
-		this.warnOnPlayingError = warnOnPlayingError;
-		this.countingStrategy = countingStrategy;
-		this.timeouts = timeouts;
-		this.runningCount = runningCount;
-		this.hands = hands;
-		this.stake = stake;
-		this.id = id;
-		
+		this.handsDiv.removeChild(hand.HTMLElement);
+	});
+}
 
-		let propertiesTable = createObjectControl(this, strategies);
-		
-		this.settingsDiv = document.createElement("div");
-		this.settingsDiv.id = "box"+id+"-info";
-		this.settingsDiv.className = "box-info";
+update()
+{
+	let bankrollInfo = this.infoDiv.querySelector("#bankroll-info");
+	bankrollInfo.innerText = this.player.bankroll;
+	let runningCountInfo = this.infoDiv.querySelector("#running-count-info");
+	runningCountInfo.innerText = this.runningCount;
 
-		this.settingsDiv.appendChild(propertiesTable);
-
-
-		this.handsDiv = document.createElement("div");
-		this.handsDiv.className = "hands";
-
-		this.infoDiv = document.createElement("div");
-		this.infoDiv.innerHTML =
-			"<table class=\"properties\">"+
-				"<tr><td>Bankroll:</td><td><span id=\"bankroll-info\" class=\"money\"></span></td></tr>"+
-				"<tr><td>Running:</td><td id=\"running-count-info\"></td></tr>"+
-			"</table>";
-
-
-		this.HTMLElement = document.createElement("div");
-		htmlParentElement.appendChild(this.HTMLElement);
-		this.HTMLElement.className = "box";
-
-		this.HTMLElement.innerHTML = "";
-		this.HTMLElement.appendChild(this.handsDiv);
-		this.HTMLElement.appendChild(this.infoDiv);
-		this.HTMLElement.appendChild(this.settingsDiv);
-
-		this.update();
-	}
-
-	clearHands()
+	this.handsDiv.innerHTML = "";
+	this.hands.forEach(hand =>
 	{
-		this.hands.forEach(hand =>
-		{
-			this.handsDiv.removeChild(hand.HTMLElement);
-		});
-	}
+		this.handsDiv.appendChild(hand.HTMLElement);
+		hand.update();
+	});
+}
 
-	update()
-	{
-		let bankrollInfo = this.infoDiv.querySelector("#bankroll-info");
-		bankrollInfo.innerText = this.player.bankroll;
-		let runningCountInfo = this.infoDiv.querySelector("#running-count-info");
-		runningCountInfo.innerText = this.runningCount;
-
-		this.handsDiv.innerHTML = "";
-		this.hands.forEach(hand =>
-		{
-			this.handsDiv.appendChild(hand.HTMLElement);
-			hand.update();
-		});
-	}
 }
 
 
@@ -1001,11 +1014,13 @@ var playerBoxes = [new Box(
 
 
 class TableTimeouts {
-	constructor(betweenRounds = 0, shuffling = 0)
-	{
-		this.betweenRounds = betweenRounds;
-		this.shuffling = shuffling;
-	}
+
+constructor(betweenRounds = 0, shuffling = 0)
+{
+	this.betweenRounds = betweenRounds;
+	this.shuffling = shuffling;
+}
+
 }
 
 class TableState {
@@ -1019,6 +1034,8 @@ constructor()
 }
 
 }
+
+
 
 class Timer {
 
@@ -1034,32 +1051,37 @@ time()
 
 }
 
+
+
 class Table extends Timer {
-	constructor(
-		rules = new Rules(), timeouts = new TableTimeouts(),
-		showCurrentPlayerOnly = false,
-		current = new TableState())
-	{
-		super();
-		this.rules = rules;
-		this.timeouts = timeouts;
-		this.showCurrentPlayerOnly = showCurrentPlayerOnly;
-		this.current = current;
-		this.remainingCards = freshShuffledDecks(this.rules.numDecks);
-	}
 
-	roundsPerMinute()
-	{
-		return this.current.round / (this.time()/1000/60);
-	}
-
-	playingDecisionData()
-	{
-		return new PlayingDecisionData(
-			this.rules, this.current.hand, this.current.box,
-			dealerBox.hands[0], this.remainingCards);
-	}
+constructor(
+	rules = new Rules(), timeouts = new TableTimeouts(),
+	showCurrentPlayerOnly = false,
+	current = new TableState())
+{
+	super();
+	this.rules = rules;
+	this.timeouts = timeouts;
+	this.showCurrentPlayerOnly = showCurrentPlayerOnly;
+	this.current = current;
+	this.remainingCards = freshShuffledDecks(this.rules.numDecks);
 }
+
+roundsPerMinute()
+{
+	return this.current.round / (this.time()/1000/60);
+}
+
+playingDecisionData()
+{
+	return new PlayingDecisionData(
+		this.rules, this.current.hand, this.current.box,
+		dealerBox.hands[0], this.remainingCards);
+}
+
+}
+
 
 var table = new Table();
 

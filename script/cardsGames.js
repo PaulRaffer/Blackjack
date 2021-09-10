@@ -57,24 +57,26 @@ function rankToHTMLUnicodeCardPart(rank)
 }
 
 class Card {
-	constructor(suit, rank)
-	{
-		this.suit = suit;
-		this.rank = rank;
-	}
 
-	HTMLFront()
-	{
-		return '&#x1F0'
-				+ suitToHTMLUnicodeCardPart(this.suit)
-				+ rankToHTMLUnicodeCardPart(this.rank)
-				+ ';';
-	}
+constructor(suit, rank)
+{
+	this.suit = suit;
+	this.rank = rank;
+}
 
-	HTMLBack()
-	{
-		return '&#x1F0A0;';
-	}
+HTMLFront()
+{
+	return	'&#x1F0' +
+		suitToHTMLUnicodeCardPart(this.suit) +
+		rankToHTMLUnicodeCardPart(this.rank) +
+		';';
+}
+
+HTMLBack()
+{
+	return '&#x1F0A0;';
+}
+
 }
 
 function freshDeck()
