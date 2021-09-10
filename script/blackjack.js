@@ -394,7 +394,7 @@ constructor(data)
 
 isConfirmed()
 {
-	return phase == this.phase() &&
+	return table.current.phase == this.phase() &&
 		(this.isLegal() || this.alertIllegal()) &&
 		(!this.warnOnIncorrect() ||
 		this.isCorrect() || this.confirmIncorrect());
@@ -630,10 +630,10 @@ execute()
 async function autoMove(data)
 {
 	next(false);
-	if (phase == Phase.BETTING) {
+	if (table.current.phase == Phase.BETTING) {
 		data.box.bettingStrategy(data.rules)(data.box, data.rules);
 	}
-	else if (phase == Phase.PLAYING) {
+	else if (table.current.phase == Phase.PLAYING) {
 		await autoPlay(data);
 	}
 	next();
@@ -642,11 +642,11 @@ async function autoMove(data)
 function autoStep(data)
 {
 	next(false);
-	if (phase == Phase.BETTING) {
+	if (table.current.phase == Phase.BETTING) {
 		data.box.bettingStrategy(data.rules)(data.box, data.rules);
 		next();
 	}
-	else if (phase == Phase.PLAYING) {
+	else if (table.current.phase == Phase.PLAYING) {
 		data.box.playingStrategy(data).make();
 	}
 }
@@ -857,11 +857,11 @@ async function start(table)
 		
 		console.log("roundsPerMinute: "+table.roundsPerMinute());
 
-		for (phase = Phase.BETTING; phase <= Phase.SHOWDOWN; phase++) {
+		for (table.current.phase = Phase.BETTING; table.current.phase <= Phase.SHOWDOWN; table.current.phase++) {
 
 			for (table.current.box of playerBoxes) {
 				table.current.box.HTMLElement.classList.add("current");
-				switch (phase) {
+				switch (table.current.phase) {
 				case Phase.BETTING:
 					await betting(table.current.box, table.rules);
 					break;
@@ -880,7 +880,7 @@ async function start(table)
 			}
 			
 			dealerBox.HTMLElement.classList.add("current");
-			switch (phase) {
+			switch (table.current.phase) {
 			case Phase.DEALING:
 				dealingDealer(playerBoxes, dealerBox, table.remainingCards);
 				break;
