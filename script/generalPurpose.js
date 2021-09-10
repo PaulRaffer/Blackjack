@@ -106,7 +106,7 @@ function setInputValue(input, value)
 }
 
 var createObjectControlCount = 0;
-function createObjectControl(object, datalists, displayIcons = { "none": ">", "block": "v" })
+function createObjectControl(object, datalists, displayIcons = { "none": ">", "block": "v" }, timeout = 1000)
 {
 	let div = document.createElement("div");
 
@@ -156,7 +156,7 @@ function createObjectControl(object, datalists, displayIcons = { "none": ">", "b
 							setInputValue(propertyValue, object[p]);
 							oldValue = object[p];
 						}
-					}, 1000)
+					}, timeout)
 				})
 
 
@@ -188,4 +188,21 @@ function createObjectControl(object, datalists, displayIcons = { "none": ">", "b
 
 	createObjectControlCount++;
 	return div;
+}
+
+
+
+class View {
+
+	constructor(object, parentHtmlElement)
+	{
+		this.object = object;
+		this.htmlElement = document.createElement("div");
+		parentHtmlElement.appendChild(this.htmlElement);
+
+		object.setCurrent = current => current ?
+			this.htmlElement.classList.add("current") :
+			this.htmlElement.classList.remove("current");
+	}
+
 }
