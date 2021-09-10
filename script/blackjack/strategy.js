@@ -353,3 +353,10 @@ function resetRunningCounts(boxes)
 {
 	boxes.forEach(box => box.runningCount = 0);
 }
+
+
+const strategies = {
+	bettingStrategy: [flatBettingStrategy(10), flatBettingStrategy(100), flatBettingStrategy(1000)],
+	playingStrategy: [basicStrategy, superEasyBasicStrategy, noBustStrategy, dealerS17Strategy, dealerH17Strategy],
+	countingStrategy: [hiLoCountingStrategy, koCountingStrategy]
+};

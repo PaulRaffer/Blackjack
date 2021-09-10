@@ -28,194 +28,7 @@ const rankValues = {
 
 
 
-function cardsValues(cards)
-{
-	var value = [0];
-	for (card of cards) {
-		value = combineElements(value, rankValues[card.rank]);
-	}
-	return [...new Set(value)];
-}
 
-function validCardsValues(cards)
-{
-	return cardsValues(cards).filter(v => v <= 21);
-}
-
-function bestCardsValue(cards)
-{
-	return validCardsValues(cards)[0];
-}
-
-
-function validHandValues(hand)
-{
-	return validCardsValues(hand.cards);
-}
-
-function bestHandValue(hand)
-{
-	return bestCardsValue(hand.cards);
-}
-
-
-
-function isSoft(cards)
-{
-	return validCardsValues(cards).length == 2;
-}
-
-function isHard(cards)
-{
-	return validCardsValues(cards).length == 1;
-}
-
-function isBust(cards)
-{
-	return cardsValues(cards).every(v => v > 21);
-}
-
-function hasNCards(n)
-{
-	return cards => cards.length == n;
-}
-
-const has2Cards = hasNCards(2);
-
-
-function isRankPair(cards)
-{
-	return has2Cards(cards) && cards[0].rank == cards[1].rank;
-}
-
-function isValuePair(cards)
-{
-	return has2Cards(cards) && rankValues[cards[0].rank][0] == rankValues[cards[1].rank][0];
-}
-
-
-
-
-
-class HandView extends View {
-
-	constructor(hand, htmlParentElement)
-	{
-		super(hand, htmlParentElement);
-
-		this.htmlElement.innerHTML =
-			"<span id=\"cards-view\"></span>"+
-			"<table class=\"properties\">"+
-				"<tr><td>Value:</td><td id=\"value-info\"></td></tr>"+
-				"<tr><td>Stake:</td><td id=\"stake-info\"></td></tr>"+
-			"</table>";
-
-		this.htmlElement.className = "hand";
-
-		hand.update = () =>
-		{
-			const value = cardsValues(hand.cards);
-
-			let cards =
-			this.htmlElement.querySelector("#cards-view");
-			cards.innerHTML = cardsToString(hand.cards);
-
-			let valueInfo =
-				this.htmlElement.querySelector("#value-info");
-			valueInfo.innerText = value + (value.every(v => v > 21) ? " (Bust)" : "");
-
-			let stakeInfo =
-				this.htmlElement.querySelector("#stake-info");
-			stakeInfo.innerHTML = moneyToString(hand.stake);
-		};
-
-		hand.update();
-	}
-
-}
-
-class Hand {
-
-	constructor(cards = [], stake = 0, resplitCount = 0)
-	{
-		this.cards = cards;
-		this.stake = stake;
-		this.resplitCount = resplitCount;
-	}
-
-}
-	
-
-function isHandSplitablePair(rules)
-{
-	return rules.canSplitSameRankOnly ? isRankPair : isValuePair;
-}
-
-function isValueN(n)
-{
-	return cards => bestCardsValue(cards) == n;
-}
-
-const isValue21 = isValueN(21);
-
-
-function isHandSoft(hand)
-{
-	return isSoft(hand.cards);
-}
-
-function isHandHard(hand)
-{
-	return isHard(hand.cards);
-}
-
-function isHandBust(hand)
-{
-	return isBust(hand.cards);
-}
-
-function hasHandNCards(n)
-{
-	return hand => hasNCards(n)(hand.cards);
-}
-
-const hasHand2Cards = hasHandNCards(2);
-
-
-function isHandFresh(hand)
-{
-	return hand.resplitCount == 0 && hasHand2Cards(hand);
-}
-
-function isHandRankPair(hand)
-{
-	return isRankPair(hand.cards);
-}
-
-function isHandValuePair(hand)
-{
-	return isValuePair(hand.cards);
-}
-
-function isHandSplitablePair(rules)
-{
-	return rules.canSplitSameRankOnly ? isHandRankPair : isHandValuePair;
-}
-
-function isHandValue21(hand)
-{
-	return isValue21(hand.cards);
-}
-
-function isHandNatural(hand)
-{
-	return isHandFresh(hand) && isHandValue21(hand);
-}
-
-function isHandSplit(hand)
-{
-	return hand.resplitCount > 0;
-}
 
 
 class Payouts {
@@ -262,186 +75,7 @@ class Rules {
 }
 
 
-class Player {
 
-	constructor(bankroll)
-	{
-		this.bankroll = bankroll;
-	}
-
-}
-
-class BoxTimeouts {
-
-	constructor(autoBet = 0, deal = 0, autoPlay = 0, showdown = 0)
-	{
-		this.autoBet = autoBet;
-		this.deal = deal;
-		this.autoPlay = autoPlay;
-		this.showdown = showdown;
-	}
-
-}
-
-const strategies = {
-	bettingStrategy: [flatBettingStrategy(10), flatBettingStrategy(100), flatBettingStrategy(1000)],
-	playingStrategy: [basicStrategy, superEasyBasicStrategy, noBustStrategy, dealerS17Strategy, dealerH17Strategy],
-	countingStrategy: [hiLoCountingStrategy, koCountingStrategy]
-};
-
-
-
-class Box {
-
-	constructor(player,
-		bettingStrategy, autoBet = false, warnOnBettingError = false,
-		playingStrategy, autoPlay = false, warnOnPlayingError = false,
-		countingStrategy,
-		timeouts = new BoxTimeouts(),
-		runningCount = 0,
-		hands = [], stake = 0)
-	{
-		this.player = player;
-		this.bettingStrategy = bettingStrategy;
-		this.autoBet = autoBet;
-		this.warnOnBettingError = warnOnBettingError;
-		this.playingStrategy = playingStrategy;
-		this.autoPlay = autoPlay;
-		this.warnOnPlayingError = warnOnPlayingError;
-		this.countingStrategy = countingStrategy;
-		this.timeouts = timeouts;
-		this.runningCount = runningCount;
-		this.hands = hands;
-		this.stake = stake;
-	}
-
-	async bet_(table) { return this.bet(table); }
-	async deal_(table) { return this.deal(table); }
-	async play_(table) { return this.play(table); }
-	async showdown_(table) { return this.showdown(table); }
-}
-
-class PlayerBox extends Box {
-
-	async bet(table)
-	{
-		next(false);
-		if (this.autoBet && this.bettingStrategy) {
-			await waitFor(this.timeouts.autoBet);
-			this.bettingStrategy(table.rules)(this, table.rules);
-		}
-		else {
-			let bettingInput = document.getElementById("betting-input");
-			bettingInput.classList.remove("disabled");
-			
-			await waitUntil(() => nextFlag);
-	
-			bettingInput.classList.add("disabled");
-		}
-	}
-	
-	async deal(table)
-	{
-		await waitFor(this.timeouts.deal);
-		if (this.stake >= table.rules.limits.min &&
-			this.stake <= table.rules.limits.max) {
-			this.hands = [new Hand(
-				[drawAndCountCard(table.remainingCards, table.playerBoxes),
-				drawAndCountCard(table.remainingCards, table.playerBoxes)],
-				this.stake)];
-				this.update();
-		}
-	}
-	
-	async play(table)
-	{
-		for (table.current.hand of this.hands) {
-			table.current.hand.setCurrent(true);
-	
-			const data = table.playingDecisionData();
-	
-			while (table.current.hand.cards.length < 2) {
-				new Hit(data).execute();
-			}
-			next(false);
-			
-			await (this.autoPlay && this.playingStrategy ? 
-				autoPlay : manuPlay)(data);
-			
-			table.current.hand.setCurrent(false);
-		}
-	}
-	
-	async showdown(table)
-	{
-		await waitFor(this.timeouts.showdown);
-		let dealerHand = table.dealerBox.hands[0];
-		for (table.current.hand of this.hands) {
-			table.current.hand.setCurrent(true);
-	
-			const profit = table.current.hand.stake *
-				payout(table.current.hand, dealerHand, table.rules);
-			moveMoney(profit, this, table.dealerBox);
-	
-			table.current.hand.setCurrent(false);
-		};
-		table.dealerBox.update();
-	}
-
-}
-
-
-
-class BoxView extends View {
-
-constructor(box, htmlParentElement)
-{
-	super(box, htmlParentElement);
-
-	let propertiesTable = createObjectControl(box, strategies);
-	
-	this.settingsDiv = document.createElement("div");
-	this.settingsDiv.className = "box-info";
-
-	this.settingsDiv.appendChild(propertiesTable);
-
-
-	this.handsDiv = document.createElement("div");
-	this.handsDiv.className = "hands";
-
-	this.infoDiv = document.createElement("div");
-	this.infoDiv.innerHTML =
-		"<table class=\"properties\">"+
-			"<tr><td>Bankroll:</td><td id=\"bankroll-info\" class=\"money\"></td></tr>"+
-			"<tr><td>Running:</td><td id=\"running-count-info\"></td></tr>"+
-		"</table>";
-
-
-	this.htmlElement.className = "box";
-
-	this.htmlElement.appendChild(this.handsDiv);
-	this.htmlElement.appendChild(this.infoDiv);
-	this.htmlElement.appendChild(this.settingsDiv);
-
-	box.update = () =>
-	{
-		let bankrollInfo =
-			this.infoDiv.querySelector("#bankroll-info");
-		bankrollInfo.innerText = box.player.bankroll;
-
-		let runningCountInfo =
-			this.infoDiv.querySelector("#running-count-info");
-		runningCountInfo.innerText = box.runningCount;
-	
-		this.handsDiv.innerHTML = "";
-		box.hands.forEach(hand =>
-			new HandView(hand, this.handsDiv));
-	};
-
-	box.update();
-}
-
-}
 
 
 
@@ -555,36 +189,6 @@ async function manuPlay(data)
 
 
 
-function dealingDealer(playerBoxes, dealerBox, remainingCards)
-{
-	dealerBox.hands = [new Hand([
-		drawAndCountCard(remainingCards, playerBoxes)])];
-	dealerBox.update();
-}
-
-function playingDealer(dealerBox, remainingCards)
-{
-	next(false);
-	while (!nextFlag) {
-		dealerBox.playingStrategy(new PlayingDecisionData(
-			table.rules, dealerBox.hands[0], dealerBox,
-			dealerBox.hands[0], remainingCards)).make();
-	}
-}
-
-async function showdownDealer(table)
-{
-	await waitFor(table.timeouts.betweenRounds);
-	if (isCutCardReached(table)) {
-		resetRunningCounts(table.playerBoxes);
-		table.remainingCards =
-			freshShuffledDecks(table.rules.numDecks);
-		await waitFor(table.timeouts.shuffling);
-	}
-}
-
-
-
 function isHandOnlyNatural(hand, hand2)
 {
 	return isHandNatural(hand) && !isHandNatural(hand2);
@@ -630,30 +234,12 @@ async function start(table)
 		console.log("roundsPerMinute: "+table.roundsPerMinute());
 
 		for (table.current.phase of Object.values(Phase)) {
-
-			for (table.current.box of table.playerBoxes) {
+			for (table.current.box of table.playerBoxes.concat([table.dealerBox])) {
 				table.current.box.setCurrent(true);
 				await table.current.phase.call(table.current.box, table);
 				table.current.box.setCurrent(false);
 				table.current.box.update();
 			}
-
-			table.current.box = table.dealerBox;
-			table.current.hand = table.dealerBox.hands[0];
-			
-			table.dealerBox.setCurrent(true);
-			switch (table.current.phase) {
-			case Phase.DEALING:
-				dealingDealer(table.playerBoxes, table.dealerBox, table.remainingCards);
-				break;
-			case Phase.PLAYING:
-				playingDealer(table.dealerBox, table.remainingCards);
-				break;
-			case Phase.SHOWDOWN:
-				await showdownDealer(table);
-				break;
-			}
-			table.dealerBox.setCurrent(false);
 		}
 	}
 }
@@ -749,12 +335,12 @@ var boxesDiv = document.getElementById("boxes");
 
 
 var defaultDealer = new Player(0);
-var defaultDealerBox = new Box(
+var defaultDealerBox = new DealerBox(
 	defaultDealer,
 	undefined, false, false,
 	dealerS17Strategy, true, false);
 
-///defaultDealerBox.htmlElement.classList.add("dealer");
+
 
 
 var defaultPlayer = new Player(10000);
@@ -765,7 +351,7 @@ var defaultPlayerBox = new PlayerBox(
 	basicStrategy, debug ? true : false, true,
 	hiLoCountingStrategy);
 	var defaultPlayerBoxes = [defaultPlayerBox];
-	
+
 
 new BoxView(defaultDealerBox, boxesDiv);
 new BoxView(defaultPlayerBox, boxesDiv);
@@ -795,19 +381,7 @@ class TableState {
 
 
 
-class Timer {
 
-	constructor()
-	{
-		this.startTime = new Date();
-	}
-
-	time()
-	{
-		return new Date() - this.startTime;
-	}
-
-}
 
 
 

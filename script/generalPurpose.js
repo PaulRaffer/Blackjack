@@ -47,6 +47,20 @@ const waitUntil = (condition) => {
 const waitFor = (delay) => new Promise((resolve) => setTimeout(resolve, delay))
 
 
+class Timer {
+
+	constructor()
+	{
+		this.startTime = new Date();
+	}
+
+	time()
+	{
+		return new Date() - this.startTime;
+	}
+
+}
+
 
 function toggleDisplay(element)
 {
