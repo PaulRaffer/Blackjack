@@ -1,10 +1,11 @@
 /* Copyright (c) 2021 Paul Raffer */
 
+
 * {
 	color: white;
 }
+
 input, button, select {
-	/*color: black;*/
 	background-color: inherit;
 	border-width: 1px;
 	border-style: solid;
@@ -82,10 +83,7 @@ input, button, select {
 .hand.current select {
 	border-color: #97C14B;
 }
-/*
-.cards {
-	padding: 1em;
-}*/
+
 
 .money {
 	color: darkgoldenrod;

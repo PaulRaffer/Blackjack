@@ -904,9 +904,6 @@ async function start(table)
 function initInput(table)
 {
 	let stakeInput = document.getElementById("stake");
-	/*stakeInput.min = table.rules.limits.min;
-	stakeInput.max = table.rules.limits.max;
-	stakeInput.placeholder = table.rules.limits.min+"<x<"+table.rules.limits.max;*/
 	stakeInput.value = table.rules.limits.min;
 
 	let placeBetButton = document.getElementById("place-bet-button");

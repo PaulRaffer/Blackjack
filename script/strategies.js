@@ -1,11 +1,5 @@
-/*function flatBettingStrategy(stake)
-{
-	function flatBettingStrategy(box, rules)
-	{
-		return new BettingDecision(box, stake, rules).placeBet();
-	}
-	return flatBettingStrategy;
-}*/
+// Copyright (c) 2021 Paul Raffer
+
 
 function flatBettingStrategy(stake)
 {
