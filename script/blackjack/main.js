@@ -242,7 +242,7 @@ function initAddPlayerBoxButton(table)
 		{
 			let player = new Player(10000);
 			const newPlayerBox = new PlayerBox(player,
-				flatBettingStrategyMin(table.rules),
+				flatBettingStrategyMin(table.settings.rules),
 				debug ? true : false, false,
 				basicStrategy, debug ? true : false, true,
 				hiLoCountingStrategy);
@@ -256,7 +256,7 @@ function initAddPlayerBoxButton(table)
 
 function initTableSettings(table)
 {
-	var tableSettings = createObjectControl(table);
+	var tableSettings = createObjectControl(table.settings);
 	let tableDiv = document.getElementById("table-settings");
 	tableDiv.appendChild(tableSettings);
 

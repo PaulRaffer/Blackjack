@@ -92,7 +92,7 @@ class PlayerBox extends Box {
 				[drawAndCountCard(table.remainingCards, table.playerBoxes),
 				drawAndCountCard(table.remainingCards, table.playerBoxes)],
 				this.stake)];
-				this.update();
+				this.update(table.current.hand);
 		}
 	}
 	
@@ -100,7 +100,7 @@ class PlayerBox extends Box {
 	{
 		for (table.current.hand of this.hands) {
 			table.current.hand.setCurrent(true);
-	
+
 			const data = table.playingDecisionData();
 	
 			while (table.current.hand.cards.length < 2) {
@@ -121,14 +121,14 @@ class PlayerBox extends Box {
 		let dealerHand = table.dealerBox.hands[0];
 		for (table.current.hand of this.hands) {
 			table.current.hand.setCurrent(true);
-	
+			
 			const profit = table.current.hand.stake *
 				payout(table.current.hand, dealerHand, table.settings.rules);
 			moveMoney(profit, this, table.dealerBox);
 	
 			table.current.hand.setCurrent(false);
 		};
-		table.dealerBox.update();
+		table.dealerBox.update(table.current.hand);
 	}
 
 }
@@ -143,7 +143,7 @@ class DealerBox extends Box {
 	{
 		table.current.box.hands = [new Hand([
 			drawAndCountCard(table.remainingCards, table.playerBoxes)])];
-			table.current.box.update();
+			table.current.box.update(table.current.hand);
 	}
 	
 	play(table)
@@ -207,7 +207,7 @@ constructor(box, htmlParentElement)
 	this.htmlElement.appendChild(this.infoDiv);
 	this.htmlElement.appendChild(this.settingsDiv);
 
-	box.update = () =>
+	box.update = (currentHand) =>
 	{
 		let bankrollInfo =
 			this.infoDiv.querySelector("#bankroll-info");
@@ -220,6 +220,8 @@ constructor(box, htmlParentElement)
 		this.handsDiv.innerHTML = "";
 		box.hands.forEach(hand =>
 			new HandView(hand, this.handsDiv));
+
+		currentHand && currentHand.setCurrent(true);
 	};
 
 	box.update();
