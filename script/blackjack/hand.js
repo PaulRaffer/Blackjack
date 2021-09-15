@@ -76,14 +76,14 @@ class Hand {
 
 class HandView extends View {
 
-	constructor(hand, htmlParentElement)
+	constructor(hand, htmlParentElement, table)
 	{
 		super(hand, htmlParentElement);
 
 		this.htmlElement.innerHTML =
 			"<span id=\"cards-view\"></span>"+
 			"<table class=\"properties\">"+
-				"<tr><td>Value:</td><td id=\"value-info\"></td></tr>"+
+				"<tr id=\"value-tr\"><td>Value:</td><td id=\"value-info\"></td></tr>"+
 				"<tr><td>Stake:</td><td id=\"stake-info\"></td></tr>"+
 			"</table>";
 
@@ -100,6 +100,10 @@ class HandView extends View {
 			let valueInfo =
 				this.htmlElement.querySelector("#value-info");
 			valueInfo.innerText = value + (value.every(v => v > 21) ? " (Bust)" : "");
+			let valueTr = this.htmlElement.querySelector("#value-tr");
+			table.settings.view.showHandTotals ?
+				valueTr.classList.remove("display-none") :
+				valueTr.classList.add("display-none");
 
 			let stakeInfo =
 				this.htmlElement.querySelector("#stake-info");

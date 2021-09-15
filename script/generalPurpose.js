@@ -1,6 +1,14 @@
 // Copyright (c) 2021 Paul Raffer
 
 
+function camelCaseToLowerCase(string)
+{
+	return string.replace(/[A-Z]/g,
+		match => ' '+match.charAt(0).toLowerCase());
+}
+
+
+
 function shuffle(array)
 {
 	for (let i = array.length - 1; i > 0; i--) {
@@ -31,20 +39,28 @@ function combineElements(arrayA, arrayB, op = (a, b) => a + b)
 
 
 
-const waitUntil = (condition) => {
+
+
+const doWhen = (condition, action, timeout = 1000) => {
 	return new Promise((resolve) => {
 		let interval = setInterval(() => {
-			if (!condition()) {
-				return
-			}
+			if (condition())
+				action(resolve, interval);
+		}, timeout);
+	});
+};
 
-			clearInterval(interval)
-			resolve()
-		}, 100)
-	})
+const waitUntil = (condition, timeout = 10) => {
+	return doWhen(condition,
+		(resolve, interval) => {
+			clearInterval(interval);
+			resolve();
+		}, timeout);
 }
 
-const waitFor = (delay) => new Promise((resolve) => setTimeout(resolve, delay))
+const waitFor = (delay) =>
+	new Promise((resolve) =>
+		setTimeout(resolve, delay));
 
 
 class Timer {
@@ -61,14 +77,14 @@ class Timer {
 
 }
 
-
-function toggleDisplay(element)
+function initButtons()
 {
-	element.style.display =
-			element.style.display == "none" ||
-			element.style.display == ""
-					? "block" : "none";
+	let buttons = document.getElementsByTagName("button");
+	for (let b of buttons)
+		b.title = b.accessKeyLabel || b.accessKey ? "Alt+"+b.accessKey : "";
 }
+
+
 
 function moneyToString(money)
 {
@@ -111,19 +127,55 @@ function getInputValue(input)
 
 function setInputValue(input, value)
 {
-	if (input.type == "checkbox") {
+	if (input.type == "checkbox")
 		input.checked = value;
-	}
-	else {
+	else
 		input.value = value;
-	}
 }
 
-var createObjectControlCount = 0;
-function createObjectControl(object, datalists, displayIcons = { "none": ">", "block": "v" }, timeout = 1000)
+function createSelect(object, p, datalist)
 {
-	let div = document.createElement("div");
+	let select = document.createElement("select");
+	
+	for (let o = 0; o < datalist.length; o++) {
+		optionName = datalist[o].name;
+		let option = document.createElement("option");
+		option.value = optionName;
+		option.innerText = optionName;
+		select.appendChild(option);
+		
+		if (object[p] && optionName == object[p].name)
+			select.selectedIndex = o;
+	}
+	
+	select.onchange = event =>
+		object[p] = window[getInputValue(select)];
+	
+	return select;
+}
 
+function createInput(object, p)
+{
+	let input = document.createElement("input");
+
+	input.type = typeToInputType(typeof object[p]);
+	setInputValue(input, object[p]);
+
+	input.onchange = event =>
+		object[p] = getInputValue(input);
+
+	let oldValue = object[p];
+	doWhen(() => oldValue != object[p], () => {
+		setInputValue(input, object[p]);
+		oldValue = object[p];
+	});
+	
+	return input;
+}
+
+createTable.count = 0;
+function createTable(object, datalists)
+{
 	let propertiesTable = document.createElement("table");
 	propertiesTable.className = "properties";
 	for (let p in object)
@@ -131,76 +183,60 @@ function createObjectControl(object, datalists, displayIcons = { "none": ">", "b
 		let propertyTR = document.createElement("tr");
 		let propertyTD1 = document.createElement("td");
 		let propertyName = document.createElement("label");
-		propertyName.htmlFor = "table"+createObjectControlCount+"-"+p+"-input";
-		propertyName.innerHTML = p+":";
+
+		propertyName.innerHTML = camelCaseToLowerCase(p)+":";
 		propertyTD1.appendChild(propertyName);
 
 		let propertyTD2 = document.createElement("td");
-		let propertyValue = null;
-		if (isObject(object[p])) {
-			propertyValue = createObjectControl(object[p]);
-		}
-		else {
-			if (datalists && datalists[p]) {
-				propertyValue = document.createElement("select");
-				
-				propertyValue.onchange = event => object[p] = window[getInputValue(propertyValue)];
+		let propertyValue =
+			isObject(object[p]) ?
+				createObjectControl(object[p]) :
+			datalists[p] ?
+				createSelect(object, p, datalists[p]) :
+				createInput(object, p);
 
-				for (let o = 0; o < datalists[p].length; o++) {
-					optionName = datalists[p][o].name;
-					let option = document.createElement("option");
-					option.value = optionName;
-					option.innerText = optionName;
-					propertyValue.appendChild(option);
+		propertyValue.id =
+			"table"+createTable.count+++"-"+p+"-input";
+		propertyName.htmlFor = propertyValue.id;
+		propertyValue.className = p+"-input";
 
-					if (object[p] && optionName == object[p].name)
-						propertyValue.selectedIndex = o;
-				}
-			}
-			else {
-				propertyValue = document.createElement("input");
-				propertyValue.type = typeToInputType(typeof object[p]);
-				setInputValue(propertyValue, object[p]);
-				propertyValue.onchange = event => object[p] = getInputValue(propertyValue);
-				
-				let oldValue = object[p];
-				new Promise((resolve) => {
-					let interval = setInterval(() => {
-						if (oldValue != object[p]) {
-							setInputValue(propertyValue, object[p]);
-							oldValue = object[p];
-						}
-					}, timeout)
-				})
-
-
-			}
-			propertyValue.id = "table"+createObjectControlCount+"-"+p+"-input";
-			propertyValue.className = p+"-input";
-		}
 		propertyTD2.appendChild(propertyValue);
 		propertyTR.appendChild(propertyTD1);
 		propertyTR.appendChild(propertyTD2);
 		propertiesTable.appendChild(propertyTR);
 	}
 
+	return propertiesTable;
+}
+
+function createToggleButton(element, icons)
+{
 	let toggleTableButton = document.createElement("button");
 	toggleTableButton.className = "toggle";
 	toggleTableButton.onclick = () =>
-		{
-			propertiesTable.style.display =
-					propertiesTable.style.display == "none" ?
-							"block" : "none";
-			toggleTableButton.innerText = displayIcons[propertiesTable.style.display];
-		};
-	propertiesTable.style.display = "none";
-	toggleTableButton.innerText = displayIcons[propertiesTable.style.display];
+	{
+		element.classList.toggle("display-none");
+		toggleTableButton.innerText = icons[
+			element.classList.contains("display-none")];
+	};
+	toggleTableButton.onclick();
 
-	
+	return toggleTableButton;
+}
+
+
+function createObjectControl(
+	object, datalists = {},
+	displayIcons = { true: ">", false: "v"}, timeout = 1000)
+{
+	let div = document.createElement("div");
+
+	let table = createTable(object, datalists);
+	let toggleTableButton = createToggleButton(table, displayIcons);
+
 	div.appendChild(toggleTableButton);
-	div.appendChild(propertiesTable);
+	div.appendChild(table);
 
-	createObjectControlCount++;
 	return div;
 }
 

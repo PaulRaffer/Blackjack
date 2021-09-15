@@ -176,7 +176,7 @@ class DealerBox extends Box {
 
 class BoxView extends View {
 
-constructor(box, htmlParentElement)
+constructor(box, htmlParentElement, table)
 {
 	super(box, htmlParentElement);
 
@@ -219,7 +219,7 @@ constructor(box, htmlParentElement)
 	
 		this.handsDiv.innerHTML = "";
 		box.hands.forEach(hand =>
-			new HandView(hand, this.handsDiv));
+			new HandView(hand, this.handsDiv, table));
 
 		currentHand && currentHand.setCurrent(true);
 	};

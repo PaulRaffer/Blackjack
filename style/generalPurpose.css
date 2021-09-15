@@ -27,6 +27,7 @@ td {
 	}
 }
 
+.display-none,
 .debug {
 	display: none !important;
 }

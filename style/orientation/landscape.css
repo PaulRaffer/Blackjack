@@ -15,12 +15,6 @@
 	overflow: auto;
 	min-height: 100%;
     max-height: 100%;
-	min-width: 26em;
-}
-
-@media only screen and (max-width: 50em) {
-	.table #boxes>.box {
-		width: 19.5em;
-		min-width: 19.5em;
-	}
+	min-width: max(20%, 14.4em);
+	width: 50%;
 }

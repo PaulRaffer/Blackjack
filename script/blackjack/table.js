@@ -55,9 +55,16 @@ class TableTimeouts {
 }
 
 class TableViewSettings {
-	constructor(showCurrentPlayerOnly = false)
+	constructor(
+		showHandTotals = false,
+		showCurrentPlayerOnly = false,
+		showAutoMoveButton = false,
+		showAutoStepButton = false)
 	{
+		this.showHandTotals = showHandTotals;
 		this.showCurrentPlayerOnly = showCurrentPlayerOnly;
+		this.showAutoMoveButton = showAutoMoveButton;
+		this.showAutoStepButton = showAutoStepButton;
 	}
 }
 

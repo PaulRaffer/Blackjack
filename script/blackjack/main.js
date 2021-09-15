@@ -230,6 +230,8 @@ function initInput(table)
 	let autoStepButton = document.getElementById("auto-step-button");
 	autoStepButton.onclick = () => autoStep(table.playingDecisionData());
 
+
+	initButtons();
 	disablePlayingButtons();
 }
 
@@ -249,7 +251,7 @@ function initAddPlayerBoxButton(table)
 				
 			table.playerBoxes.push(newPlayerBox);
 			
-			new BoxView(newPlayerBox, boxesDiv);
+			new BoxView(newPlayerBox, boxesDiv, table);
 		};
 }
 
@@ -299,13 +301,12 @@ var defaultPlayerBox = new PlayerBox(
 	var defaultPlayerBoxes = [defaultPlayerBox];
 
 
-new BoxView(defaultDealerBox, boxesDiv);
-new BoxView(defaultPlayerBox, boxesDiv);
-
-
-
-
 var table = new Table();
+
+new BoxView(defaultDealerBox, boxesDiv, table);
+new BoxView(defaultPlayerBox, boxesDiv, table);
+
+
 
 function init(table)
 {
@@ -317,6 +318,7 @@ function init(table)
 function main()
 {
 	init(table);
+
 	start(table);
 }
 main();
