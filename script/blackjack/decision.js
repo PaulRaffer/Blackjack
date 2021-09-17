@@ -102,7 +102,7 @@ class BettingDecision extends Decision {
 			
 
 			"Your stake: " + this.data.stake + "$\n" +
-			"Correct stake (" + this.data.box.bettingStrategy.name + "): " + this.data.box.bettingStrategy(this.data.box, this.data.rules) + "\n\n" +
+			"Correct stake (" + camelCaseToNormalCase(this.data.box.bettingStrategy.name) + "): " + this.data.box.bettingStrategy(this.data.box, this.data.rules) + "\n\n" +
 			"Do you really want to continue?");
 	}
 
@@ -165,7 +165,7 @@ class PlayingDecision extends Decision {
 			"Your hand: " + cardsToString2(this.data.hand.cards) + "= " + validHandValues(this.data.hand) + "\n" +
 			"Dealers hand: " + cardsToString2(this.data.dealerHand.cards) + "= " + validHandValues(this.data.dealerHand) + "\n" +
 			"Your decision: " + this.constructor.name + "\n" +
-			"Correct decision (" + this.data.box.playingStrategy.name + "): " + this.data.box.playingStrategy(this.data).constructor.name + "\n\n" +
+			"Correct decision (" + camelCaseToNormalCase(this.data.box.playingStrategy.name) + "): " + this.data.box.playingStrategy(this.data).constructor.name + "\n\n" +
 			"Do you really want to continue?");
 	}
 

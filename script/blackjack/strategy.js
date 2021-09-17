@@ -307,12 +307,8 @@ function basicStrategy(data)
 
 function noBustStrategy(data)
 {
-	if (cardsValues(data.hand.cards)[0] <= 11) {
-		return hit;
-	}
-	else {
-		return stand;
-	}
+	return (cardsValues(data.hand.cards)[0] <= 11 ?
+		hit : stand)(data);
 }
 
 

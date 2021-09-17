@@ -1,6 +1,13 @@
 // Copyright (c) 2021 Paul Raffer
 
 
+function camelCaseToNormalCase(string)
+{
+	return string
+		.replace(/[A-Z]/g, match => ' '+match.charAt(0))
+		.replace(/^[a-z]/g, match => match.charAt(0).toUpperCase());
+}
+
 function camelCaseToLowerCase(string)
 {
 	return string.replace(/[A-Z]/g,
@@ -141,7 +148,7 @@ function createSelect(object, p, datalist)
 		optionName = datalist[o].name;
 		let option = document.createElement("option");
 		option.value = optionName;
-		option.innerText = optionName;
+		option.innerText = camelCaseToNormalCase(optionName);
 		select.appendChild(option);
 		
 		if (object[p] && optionName == object[p].name)
@@ -184,7 +191,7 @@ function createTable(object, datalists)
 		let propertyTD1 = document.createElement("td");
 		let propertyName = document.createElement("label");
 
-		propertyName.innerHTML = camelCaseToLowerCase(p)+":";
+		propertyName.innerHTML = camelCaseToNormalCase(p)+":";
 		propertyTD1.appendChild(propertyName);
 
 		let propertyTD2 = document.createElement("td");
