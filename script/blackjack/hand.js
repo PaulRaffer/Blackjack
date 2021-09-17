@@ -76,9 +76,9 @@ class Hand {
 
 class HandView extends View {
 
-	constructor(hand, htmlParentElement, table)
+	constructor(hand, parentHtmlElement, table)
 	{
-		super(hand, htmlParentElement);
+		super(hand, parentHtmlElement);
 
 		this.htmlElement.innerHTML =
 			"<span id=\"cards-view\"></span>"+
@@ -89,28 +89,36 @@ class HandView extends View {
 
 		this.htmlElement.classList.add("hand");
 
-		hand.update = () =>
+		this.update = (resolve, interval) =>
 		{
-			const value = cardsValues(hand.cards);
+			if (hand.cards == undefined) {
+				this.parentHtmlElement.removeChild(this.htmlElement);
+				clearInterval(interval);
+				resolve();
+			}
+			else {
+				const value = cardsValues(hand.cards);
 
-			let cards =
-			this.htmlElement.querySelector("#cards-view");
-			cards.innerHTML = cardsToString(hand.cards);
+				let cards =
+				this.htmlElement.querySelector("#cards-view");
+				cards.innerHTML = cardsToString(hand.cards);
 
-			let valueInfo =
-				this.htmlElement.querySelector("#value-info");
-			valueInfo.innerText = value + (value.every(v => v > 21) ? " (Bust)" : "");
-			let valueTr = this.htmlElement.querySelector("#value-tr");
-			table.settings.view.showHandTotals ?
-				valueTr.classList.remove("display-none") :
-				valueTr.classList.add("display-none");
+				let valueInfo =
+					this.htmlElement.querySelector("#value-info");
+				valueInfo.innerText =
+					value + (value.every(v => v > 21) ? " (Bust)" : "");
+				let valueTr = this.htmlElement.querySelector("#value-tr");
+				table.settings.view.showHandTotals ?
+					valueTr.classList.remove("display-none") :
+					valueTr.classList.add("display-none");
 
-			let stakeInfo =
-				this.htmlElement.querySelector("#stake-info");
-			stakeInfo.innerHTML = moneyToString(hand.stake);
+				let stakeInfo =
+					this.htmlElement.querySelector("#stake-info");
+				stakeInfo.innerHTML = moneyToString(hand.stake);
+			}
 		};
 
-		hand.update();
+		doWhen(() => this.update, this.update, 10);
 	}
 
 }

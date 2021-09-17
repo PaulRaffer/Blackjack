@@ -32,9 +32,7 @@ class Box {
 		bettingStrategy, autoBet = false, warnOnBettingError = false,
 		playingStrategy, autoPlay = false, warnOnPlayingError = false,
 		countingStrategy,
-		timeouts = new BoxTimeouts(),
-		runningCount = 0,
-		hands = [], stake = 0)
+		timeouts = new BoxTimeouts())
 	{
 		this.player = player;
 		this.bettingStrategy = bettingStrategy;
@@ -45,9 +43,9 @@ class Box {
 		this.warnOnPlayingError = warnOnPlayingError;
 		this.countingStrategy = countingStrategy;
 		this.timeouts = timeouts;
-		this.runningCount = runningCount;
-		this.hands = hands;
-		this.stake = stake;
+		this.runningCount = 0;
+		this.hands = [];
+		this.stake = 0;
 	}
 
 	async bet_(table) { return this.bet(table); }
@@ -88,11 +86,12 @@ class PlayerBox extends Box {
 		await waitFor(this.timeouts.deal);
 		if (this.stake >= table.settings.rules.limits.min &&
 			this.stake <= table.settings.rules.limits.max) {
-			this.hands = [new Hand(
+			let startHand = new Hand(
 				[drawAndCountCard(table.remainingCards, table.playerBoxes),
 				drawAndCountCard(table.remainingCards, table.playerBoxes)],
-				this.stake)];
-				this.update(table.current.hand);
+				this.stake);
+			this.clearHands();
+			this.addHand(startHand);
 		}
 	}
 	
@@ -128,7 +127,6 @@ class PlayerBox extends Box {
 	
 			table.current.hand.setCurrent(false);
 		};
-		table.dealerBox.update(table.current.hand);
 	}
 
 }
@@ -141,19 +139,18 @@ class DealerBox extends Box {
 
 	deal(table)
 	{
-		table.current.box.hands = [new Hand([
-			drawAndCountCard(table.remainingCards, table.playerBoxes)])];
-			table.current.box.update(table.current.hand);
+		let dealerStartHand = new Hand([
+			drawAndCountCard(table.remainingCards, table.playerBoxes)]);
+		table.current.box.clearHands();
+		table.current.box.addHand(dealerStartHand);
 	}
 	
 	play(table)
 	{
 		next(false);
-		while (!nextFlag) {
-			table.current.box.playingStrategy(new PlayingDecisionData(
-				table.settings.rules, table.current.box.hands[0], table.current.box,
-				table.current.box.hands[0], table.remainingCards)).make();
-		}
+		while (!nextFlag)
+			table.current.box.playingStrategy(
+				table.playingDecisionData()).make();
 	}
 	
 	async showdown(table)
@@ -207,24 +204,32 @@ constructor(box, htmlParentElement, table)
 	this.htmlElement.appendChild(this.infoDiv);
 	this.htmlElement.appendChild(this.settingsDiv);
 
-	box.update = (currentHand) =>
-	{
-		let bankrollInfo =
-			this.infoDiv.querySelector("#bankroll-info");
-		bankrollInfo.innerText = box.player.bankroll;
+	box.addHand = hand =>
+		{
+			new HandView(hand, this.handsDiv, table);
+			box.hands.push(hand);
+		}
 
-		let runningCountInfo =
-			this.infoDiv.querySelector("#running-count-info");
-		runningCountInfo.innerText = box.runningCount;
-	
-		this.handsDiv.innerHTML = "";
-		box.hands.forEach(hand =>
-			new HandView(hand, this.handsDiv, table));
+	box.clearHands = () =>
+		{
+			box.hands.forEach(hand => {
+				hand.cards = undefined;
+			});
+			box.hands = [];
+		}
 
-		currentHand && currentHand.setCurrent(true);
-	};
+	this.update = () =>
+		{
+			let bankrollInfo =
+				this.infoDiv.querySelector("#bankroll-info");
+			bankrollInfo.innerText = box.player.bankroll;
 
-	box.update();
+			let runningCountInfo =
+				this.infoDiv.querySelector("#running-count-info");
+			runningCountInfo.innerText = box.runningCount;
+		};
+
+	doWhen(() => this.update, this.update, 10);
 }
 
 }

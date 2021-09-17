@@ -190,7 +190,6 @@ class Hit extends PlayingDecision {
 	execute()
 	{
 		this.data.hand.cards.push(drawAndCountCard(this.data.remainingCards, table.playerBoxes));
-		this.data.hand.update();
 		if (isHandBust(this.data.hand) || isHandValue21(this.data.hand))
 			next();
 	}
@@ -229,7 +228,6 @@ class Double extends PlayingDecision {
 		this.data.hand.stake *= 2;
 		this.data.hand.cards.push(
 			drawAndCountCard(this.data.remainingCards, table.playerBoxes));
-		this.data.hand.update();
 		next();
 	}
 	
@@ -249,11 +247,10 @@ class Split extends PlayingDecision {
 	execute()
 	{
 		var hand2 = new Hand([this.data.hand.cards.pop()], this.data.box.stake, ++this.data.hand.resplitCount);
-		this.data.box.hands.push(hand2);
+		this.data.box.addHand(hand2);
 		while (this.data.hand.cards.length < 2) {
 			new Hit(this.data).execute();
 		}
-		this.data.box.update();
 	}
 	
 }
@@ -270,7 +267,6 @@ class Surrender extends PlayingDecision {
 	execute()
 	{
 		this.data.box.player.bankroll -= 0.5 * this.data.hand.stake;
-		this.data.box.update();
 		next();
 	}
 

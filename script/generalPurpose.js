@@ -255,7 +255,8 @@ class View {
 	{
 		this.object = object;
 		this.htmlElement = document.createElement("div");
-		parentHtmlElement.appendChild(this.htmlElement);
+		this.parentHtmlElement = parentHtmlElement;
+		this.parentHtmlElement.appendChild(this.htmlElement);
 
 		object.setCurrent = current => current ?
 			this.htmlElement.classList.add("current") :

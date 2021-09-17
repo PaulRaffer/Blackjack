@@ -297,14 +297,6 @@ function basicStrategy(data)
 
 
 
-
-
-
-
-
-
-
-
 function noBustStrategy(data)
 {
 	return (cardsValues(data.hand.cards)[0] <= 11 ?

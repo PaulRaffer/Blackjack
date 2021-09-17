@@ -97,7 +97,6 @@ function countCard(card, boxes)
 		{
 			if (box.countingStrategy)
 				box.runningCount += box.countingStrategy(card);
-			box.update();
 		});
 }
 
@@ -184,7 +183,6 @@ async function start(table)
 				table.current.box.setCurrent(true);
 				await table.current.phase.call(table.current.box, table);
 				table.current.box.setCurrent(false);
-				table.current.box.update();
 			}
 		}
 	}
