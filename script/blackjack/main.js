@@ -225,13 +225,15 @@ function initInput(table)
 	nextButton.onclick = next;
 
 	let autoMoveButton = document.getElementById("auto-move-button");
-	autoMoveButton.onclick = () => autoMove(table.playingDecisionData());
+	autoMoveButton.onclick = () =>
+		autoMove(table.playingDecisionData());
 
 	let autoStepButton = document.getElementById("auto-step-button");
-	autoStepButton.onclick = () => autoStep(table.playingDecisionData());
+	autoStepButton.onclick = () =>
+		autoStep(table.playingDecisionData());
 
 
-	initButtons();
+	initAccessKeyLabels("button, a, input");
 	disablePlayingButtons();
 }
 
@@ -274,6 +276,42 @@ function initTableSettings(table)
 			document.querySelector(".table>#boxes>.box.current")
 				.style.display = "inline-flex";
 		};
+
+	{
+		let autoMoveButton = document.getElementById("auto-move-button");
+		let showAutoMoveButtonInput =
+			document.getElementsByClassName("showAutoMoveButton-input")[0];
+
+		let onChangeAction = () => {
+			let newValue = getInputValue(showAutoMoveButtonInput);
+			onChangeAction.oldValue = newValue;
+			newValue ?
+				autoMoveButton.classList.remove("display-none") :
+				autoMoveButton.classList.add("display-none");
+		};
+		onChangeAction();
+		doWhen(() =>
+			onChangeAction.oldValue != getInputValue(showAutoMoveButtonInput),
+			onChangeAction);
+	}
+
+	{
+		let autoStepButton = document.getElementById("auto-step-button");
+		let showAutoStepButtonInput =
+			document.getElementsByClassName("showAutoStepButton-input")[0];
+
+		let onChangeAction = () => {
+			let newValue = getInputValue(showAutoStepButtonInput);
+			onChangeAction.oldValue = newValue;
+			newValue ?
+				autoStepButton.classList.remove("display-none") :
+				autoStepButton.classList.add("display-none");
+		};
+		onChangeAction();
+		doWhen(() =>
+			onChangeAction.oldValue != getInputValue(showAutoStepButtonInput),
+			onChangeAction);
+	}
 }
 
 

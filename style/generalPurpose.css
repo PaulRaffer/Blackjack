@@ -22,9 +22,11 @@ td {
 }
 
 @media only screen and (max-width: 40em) {
-	.disabled {
-		display: none !important;
-	}
+
+.input>.disabled {
+	display: none !important;
+}
+
 }
 
 .display-none,

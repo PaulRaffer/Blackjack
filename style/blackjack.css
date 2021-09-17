@@ -64,6 +64,7 @@ a {
 	height: 2em;
 }
 
+
 .input * {
 	height: 100%;
 }
@@ -73,22 +74,40 @@ a {
 	display: flex;
 }
 
+#auto-input {
+	flex-grow: 0;
+}
+#auto-input>* {
+	width: 5em;
+}
+
 .input button {
 	border-radius: 0;
 	width: 0%;
 }
 
-.input>*>button {
+.input>*>* {
 	flex-grow: 1;
 }
+.input>*>.money {
+	display: flex;
+	align-items: center;
+}
+
 
 .input #stake {
-	width: 6em;
+	flex-grow: 1;
 	text-align: right;
 }
 
 
+@media only screen and (max-width: 40em) {
 
+.input>.disabled {
+	display: none !important;
+}
+
+}
 
 
 
@@ -102,8 +121,8 @@ a {
 
 
 .table .settings {
+	white-space: nowrap;
 	flex-shrink: 0;
-	overflow: auto;
 }
 
 .table #boxes {

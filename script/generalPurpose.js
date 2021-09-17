@@ -77,11 +77,11 @@ class Timer {
 
 }
 
-function initButtons()
+function initAccessKeyLabels(selectors, element = document)
 {
-	let buttons = document.getElementsByTagName("button");
-	for (let b of buttons)
-		b.title = b.accessKeyLabel || b.accessKey ? "Alt+"+b.accessKey : "";
+	let elements = element.querySelectorAll(selectors);
+	for (let e of elements)
+		e.title = e.accessKeyLabel || e.accessKey ? "Alt+"+e.accessKey : "";
 }
 
 

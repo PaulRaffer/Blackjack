@@ -148,8 +148,8 @@ class PlayingDecision extends Decision {
 		return alert(
 			"Illegal Playing Decision!\n\n" +
 			"Your hand: " + cardsToString2(this.data.hand.cards) + "= " + validHandValues(this.data.hand) + "\n" +
-			"Dealers hand: " + cardsToString2(this.data.dealerHand.cards) + "= " + validHandValues(this.dealerHand) + "\n" +
-			"Your decision: " + this.name());
+			"Dealers hand: " + cardsToString2(this.data.dealerHand.cards) + "= " + validHandValues(this.data.dealerHand) + "\n" +
+			"Your decision: " + this.constructor.name);
 	}
 
 	isCorrect()
