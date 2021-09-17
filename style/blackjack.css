@@ -15,6 +15,10 @@ a {
 	flex-direction: column;
 }
 
+.properties {
+	white-space: nowrap;
+}
+
 
 
 #links {
