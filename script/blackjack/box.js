@@ -87,8 +87,8 @@ class PlayerBox extends Box {
 		if (this.stake >= table.settings.rules.limits.min &&
 			this.stake <= table.settings.rules.limits.max) {
 			let startHand = new Hand(
-				[drawAndCountCard(table.remainingCards, table.playerBoxes),
-				drawAndCountCard(table.remainingCards, table.playerBoxes)],
+				[drawAndCountCard(countingStrategies)(table.remainingCards),
+				drawAndCountCard(countingStrategies)(table.remainingCards)],
 				this.stake);
 			this.clearHands();
 			this.addHand(startHand);
@@ -140,7 +140,7 @@ class DealerBox extends Box {
 	deal(table)
 	{
 		let dealerStartHand = new Hand([
-			drawAndCountCard(table.remainingCards, table.playerBoxes)]);
+			drawAndCountCard(countingStrategies)(table.remainingCards)]);
 		table.current.box.clearHands();
 		table.current.box.addHand(dealerStartHand);
 	}

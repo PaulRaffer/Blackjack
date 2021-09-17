@@ -189,7 +189,7 @@ class Hit extends PlayingDecision {
 
 	execute()
 	{
-		this.data.hand.cards.push(drawAndCountCard(this.data.remainingCards, table.playerBoxes));
+		this.data.hand.cards.push(drawAndCountCard(countingStrategies)(this.data.remainingCards));
 		if (isHandBust(this.data.hand) || isHandValue21(this.data.hand))
 			next();
 	}
@@ -227,7 +227,7 @@ class Double extends PlayingDecision {
 	{
 		this.data.hand.stake *= 2;
 		this.data.hand.cards.push(
-			drawAndCountCard(this.data.remainingCards, table.playerBoxes));
+			drawAndCountCard(countingStrategies)(this.data.remainingCards));
 		next();
 	}
 	

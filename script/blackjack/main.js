@@ -91,19 +91,15 @@ function autoStep(data)
 
 
 
-function countCard(card, boxes)
+const countCard = countingStrategies => card =>
 {
-	boxes.map(box =>
-		{
-			if (box.countingStrategy)
-				box.runningCount += box.countingStrategy(card);
-		});
+	countingStrategies.map(s => s.count(card));
 }
 
-function drawAndCountCard(cards, boxes)
+const drawAndCountCard = countingStrategies => cards =>
 {
 	const card = drawCard(cards);
-	countCard(card, boxes);
+	countCard(countingStrategies)(card);
 	return card;
 }
 

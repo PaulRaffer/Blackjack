@@ -207,6 +207,7 @@ button.toggle {
 
 .stand {
 	background-color: yellow;
+	color: #316033;
 }
 
 .double {
@@ -219,4 +220,5 @@ button.toggle {
 
 .surrender {
 	background-color: white;
+	color: #316033;
 }

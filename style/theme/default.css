@@ -103,13 +103,13 @@ input[type='radio'] {
 
 }
 
-.table input[type="checkbox"] {
+input[type="checkbox"] {
 	width: 1em;
 	height: 1em;
 	margin: 0;
 	padding: 0;
 }
 
-.table input[type="checkbox"]:checked {
+#game input[type="checkbox"]:checked {
 	background-color: white;
 }

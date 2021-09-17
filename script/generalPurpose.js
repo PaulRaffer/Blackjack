@@ -145,13 +145,12 @@ function createSelect(object, p, datalist)
 	let select = document.createElement("select");
 	
 	for (let o = 0; o < datalist.length; o++) {
-		optionName = datalist[o].name;
 		let option = document.createElement("option");
-		option.value = optionName;
-		option.innerText = camelCaseToNormalCase(optionName);
+		option.value = datalist[o].name;
+		option.innerText = camelCaseToNormalCase(datalist[o].name);
 		select.appendChild(option);
 		
-		if (object[p] && optionName == object[p].name)
+		if (object[p] && datalist[o].name == object[p].name)
 			select.selectedIndex = o;
 	}
 	
@@ -196,10 +195,10 @@ function createTable(object, datalists)
 
 		let propertyTD2 = document.createElement("td");
 		let propertyValue =
-			isObject(object[p]) ?
-				createObjectControl(object[p]) :
 			datalists[p] ?
 				createSelect(object, p, datalists[p]) :
+			isObject(object[p]) ?
+				createObjectControl(object[p]) :
 				createInput(object, p);
 
 		propertyValue.id =

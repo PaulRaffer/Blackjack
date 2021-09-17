@@ -63,9 +63,12 @@ function playingStrategyToTable(strategy, rules)
 			let dealerHand = new Hand(dealerCards);
 
 			let strategyTD = document.createElement("td");
-			const correctDecision = strategy(hand, dealerHand, rules);
-			if (correctDecision)
-				strategyTD.className = strategyTD.innerText = correctDecision.name;
+			const correctDecision = strategy(new PlayingDecisionData(
+				rules, hand, undefined, dealerHand, undefined));
+			if (correctDecision) {
+				strategyTD.innerText = correctDecision.constructor.name;
+				strategyTD.className = strategyTD.innerText.toLowerCase();
+			}
 
 			strategyTR.appendChild(strategyTD);
 		}
@@ -101,9 +104,12 @@ function playingStrategyToTable(strategy, rules)
 			let dealerHand = new Hand(dealerCards);
 
 			let strategyTD = document.createElement("td");
-			const correctDecision = strategy(hand, dealerHand, rules);
-			if (correctDecision)
-				strategyTD.className = strategyTD.innerText = correctDecision.name;
+			const correctDecision = strategy(new PlayingDecisionData(
+				rules, hand, undefined, dealerHand, undefined));
+			if (correctDecision) {
+				strategyTD.innerText = correctDecision.constructor.name;
+				strategyTD.className = strategyTD.innerText.toLowerCase();
+			}
 
 			strategyTR.appendChild(strategyTD);
 		}
@@ -141,10 +147,13 @@ function playingStrategyToTable(strategy, rules)
 			let dealerHand = new Hand(dealerCards);
 
 			let strategyTD = document.createElement("td");
-			const correctDecision = strategy(hand, dealerHand, rules);
-			if (correctDecision)
-				strategyTD.className = strategyTD.innerText = correctDecision.name;
-
+			const correctDecision = strategy(new PlayingDecisionData(
+				rules, hand, undefined, dealerHand, undefined));
+			if (correctDecision) {
+				strategyTD.innerText = correctDecision.constructor.name;
+				strategyTD.className = strategyTD.innerText.toLowerCase();
+			}
+			
 			strategyTR.appendChild(strategyTD);
 		}
 		strategyTable.appendChild(strategyTR);
@@ -306,45 +315,3 @@ function noBustStrategy(data)
 
 
 
-
-
-
-function hiLoCountingStrategy(card)
-{
-	const value = rankValues[card.rank][0];
-	return	value <=  6 ? +1 :
-			value >= 10 ? -1 :
-			0;
-}
-
-function koCountingStrategy(card)
-{
-	const value = rankValues[card.rank][0];
-	return	value <=  7 ? +1 :
-			value >= 10 ? -1 :
-			0;
-}
-
-
-
-
-function trueCountConversion(runningCount, numRemainingCards)
-{
-	const remainingDecks = numRemainingCards / 52;
-	const trueCount = runningCount / remainingDecks;
-	return trueCount;
-}
-
-
-
-function resetRunningCounts(boxes)
-{
-	boxes.forEach(box => box.runningCount = 0);
-}
-
-
-const strategies = {
-	bettingStrategy: [flatBettingStrategy(10), flatBettingStrategy(100), flatBettingStrategy(1000)],
-	playingStrategy: [basicStrategy, superEasyBasicStrategy, noBustStrategy, dealerS17Strategy, dealerH17Strategy],
-	countingStrategy: [hiLoCountingStrategy, koCountingStrategy]
-};
