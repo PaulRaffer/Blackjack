@@ -10,9 +10,14 @@ function cardsValues(cards)
 	return [...new Set(value)];
 }
 
+function validValues(values)
+{
+	return values.filter(v => v <= 21);
+}
+
 function validCardsValues(cards)
 {
-	return cardsValues(cards).filter(v => v <= 21);
+	return validValues(cardsValues(cards));
 }
 
 function bestCardsValue(cards)
@@ -21,7 +26,10 @@ function bestCardsValue(cards)
 }
 
 
-
+function isValuesBust(values)
+{
+	return values.every(v => v > 21);
+}
 
 
 
@@ -37,7 +45,7 @@ function isHard(cards)
 
 function isBust(cards)
 {
-	return cardsValues(cards).every(v => v > 21);
+	return isValuesBust(cardsValues(cards));
 }
 
 function hasNCards(n)
@@ -76,9 +84,9 @@ class Hand {
 
 class HandView extends View {
 
-	constructor(hand, parentHtmlElement, table)
+	constructor(hand, parentHtmlElement, table, timeout = 10)
 	{
-		super(hand, parentHtmlElement);
+		super(hand, parentHtmlElement, timeout);
 
 		this.htmlElement.innerHTML =
 			"<span id=\"cards-view\"></span>"+
@@ -88,37 +96,33 @@ class HandView extends View {
 			"</table>";
 
 		this.htmlElement.classList.add("hand");
+		
+		let cards = this.htmlElement.querySelector("#cards-view");
+		let valueInfo = this.htmlElement.querySelector("#value-info");
+		let valueTr = this.htmlElement.querySelector("#value-tr");
+		let stakeInfo = this.htmlElement.querySelector("#stake-info");
 
 		this.update = (resolve, interval) =>
-		{
-			if (hand.cards == undefined) {
-				this.parentHtmlElement.removeChild(this.htmlElement);
-				clearInterval(interval);
-				resolve();
-			}
-			else {
-				const value = cardsValues(hand.cards);
+			{
+				if (hand.cards == undefined) {
+					this.parentHtmlElement.removeChild(this.htmlElement);
+					clearInterval(interval);
+					resolve();
+				}
+				else {
+					cards.innerHTML = cardsToString(hand.cards);
 
-				let cards =
-				this.htmlElement.querySelector("#cards-view");
-				cards.innerHTML = cardsToString(hand.cards);
+					const values = cardsValues(hand.cards);
+					valueInfo.innerText =
+						values + isValuesBust(values) ? " (Bust)" : "";
+					
+					table.settings.view.showHandTotals ?
+						valueTr.classList.remove("display-none") :
+						valueTr.classList.add("display-none");
 
-				let valueInfo =
-					this.htmlElement.querySelector("#value-info");
-				valueInfo.innerText =
-					value + (value.every(v => v > 21) ? " (Bust)" : "");
-				let valueTr = this.htmlElement.querySelector("#value-tr");
-				table.settings.view.showHandTotals ?
-					valueTr.classList.remove("display-none") :
-					valueTr.classList.add("display-none");
-
-				let stakeInfo =
-					this.htmlElement.querySelector("#stake-info");
-				stakeInfo.innerHTML = moneyToString(hand.stake);
-			}
-		};
-
-		doWhen(() => this.update, this.update, 10);
+					stakeInfo.innerHTML = moneyToString(hand.stake);
+				}
+			};
 	}
 
 }

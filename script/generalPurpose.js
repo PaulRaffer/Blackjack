@@ -251,7 +251,7 @@ function createObjectControl(
 
 class View {
 
-	constructor(object, parentHtmlElement)
+	constructor(object, parentHtmlElement, timeout = 100)
 	{
 		this.object = object;
 		this.htmlElement = document.createElement("div");
@@ -261,6 +261,9 @@ class View {
 		object.setCurrent = current => current ?
 			this.htmlElement.classList.add("current") :
 			this.htmlElement.classList.remove("current");
+
+		doWhen(() => this.update, (resolve, interval) =>
+			this.update(resolve, interval), timeout);
 	}
 
 }

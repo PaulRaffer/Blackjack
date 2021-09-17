@@ -148,6 +148,7 @@ function payout(hand, dealerHand, rules)
 {
 	return isHandOnlyNatural(hand, dealerHand) ?
 			rules.payouts.natural :
+		isHandOnlyNatural(dealerHand, hand) ||
 		isHandBustOrLess(hand, dealerHand) ?
 			rules.payouts.loss :
 		isHandBustOrLess(dealerHand, hand) ?

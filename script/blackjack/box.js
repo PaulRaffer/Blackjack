@@ -147,10 +147,16 @@ class DealerBox extends Box {
 	
 	play(table)
 	{
+		table.current.hand = table.current.box.hands[0];
+		table.current.hand.setCurrent(true);
+
 		next(false);
 		while (!nextFlag)
 			table.current.box.playingStrategy(
 				table.playingDecisionData()).make();
+				next(false);
+
+		table.current.hand.setCurrent(false);
 	}
 	
 	async showdown(table)
@@ -218,18 +224,16 @@ constructor(box, htmlParentElement, table)
 			box.hands = [];
 		}
 
+	let bankrollInfo =
+		this.infoDiv.querySelector("#bankroll-info");
+	let runningCountInfo =
+		this.infoDiv.querySelector("#running-count-info");
+
 	this.update = () =>
 		{
-			let bankrollInfo =
-				this.infoDiv.querySelector("#bankroll-info");
 			bankrollInfo.innerText = box.player.bankroll;
-
-			let runningCountInfo =
-				this.infoDiv.querySelector("#running-count-info");
 			runningCountInfo.innerText = box.runningCount;
 		};
-
-	doWhen(() => this.update, this.update, 10);
 }
 
 }
