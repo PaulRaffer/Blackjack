@@ -157,8 +157,8 @@ class PlayerBox extends Box {
 		next(false);
 		if (this.autoBet && this.bettingStrategy) {
 			await waitFor(this.timeouts.autoBet);
-			this.bettingStrategy
-				(table.settings.rules)(this, table.settings.rules);
+			this.bettingStrategy(
+				new BettingDecisionData(table.settings.rules, this));
 		}
 		else {
 			let bettingInput = document.getElementById("betting-input");

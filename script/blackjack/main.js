@@ -24,62 +24,7 @@ const debug = false;
 
 
 
-var nextFlag = false;
 
-function next(n = true)
-{
-	nextFlag = n;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-async function autoMove(data)
-{
-	next(false);
-	if (table.current.phase == Phase.BETTING) {
-		data.box.bettingStrategy(data.rules)(data.box, data.rules);
-	}
-	else if (table.current.phase == Phase.PLAYING) {
-		await autoPlay(data);
-	}
-	next();
-}
-
-function autoStep(data)
-{
-	next(false);
-	if (table.current.phase == Phase.BETTING) {
-		data.box.bettingStrategy(data.rules)(data.box, data.rules);
-		next();
-	}
-	else if (table.current.phase == Phase.PLAYING) {
-		data.box.playingStrategy(data).make();
-	}
-}
-
-async function autoPlay(data)
-{
-	while (!(nextFlag || isHandValue21(data.hand))) {
-		await waitFor(data.box.timeouts.autoPlay);
-		data.box.playingStrategy(data).make();
-	}
-}
-
-async function manuPlay(data)
-{
-	enablePlayingButtons(data);
-	await waitUntil(() => nextFlag || isHandValue21(data.hand));
-	disablePlayingButtons();
-}
 
 
 
