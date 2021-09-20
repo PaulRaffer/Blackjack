@@ -1,17 +1,26 @@
 // Copyright (c) 2021 Paul Raffer
 
 
+const isInRange = (a, b) => x =>
+	a <= x && x <= b;
+
+const isInTolerance = (c, tolerance) =>
+	isInRange(c - tolerance, c + tolerance);
+
+
+
 function camelCaseToNormalCase(string)
 {
 	return string
-		.replace(/[A-Z]/g, match => ' '+match.charAt(0))
+		.replace(/[A-Z]|((?<![0-9])[0-9])/g, match => ' '+match.charAt(0))
 		.replace(/^[a-z]/g, match => match.charAt(0).toUpperCase());
 }
 
 function camelCaseToLowerCase(string)
 {
-	return string.replace(/[A-Z]/g,
-		match => ' '+match.charAt(0).toLowerCase());
+	return string
+		.replace(/[A-Z]/g, match => ' '+match.charAt(0).toLowerCase())
+		.replace(/((?<![0-9])[0-9])/g, match => ' '+match.charAt(0));
 }
 
 
@@ -42,6 +51,12 @@ function combineElements(arrayA, arrayB, op = (a, b) => a + b)
 		}
 	}
 	return result;
+}
+
+
+function renameFunction(f, name)
+{
+	return new Function("return function "+name+"(...args) { return "+f+"(...args); }")();
 }
 
 

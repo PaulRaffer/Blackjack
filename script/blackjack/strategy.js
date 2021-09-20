@@ -3,11 +3,11 @@
 
 function flatBettingStrategy(stake)
 {
-	function flatBettingStrategy(data)
-	{
-		return new BettingDecision(stake, data);
-	}
-	return flatBettingStrategy;
+	return new Function("stake",
+		"return function flatBettingStrategy"+stake+"$(data)"+
+		"{"+
+			"return new BettingDecision(stake, data);"+
+		"}")(stake);
 }
 
 function flatBettingStrategyMin(data)

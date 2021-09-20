@@ -28,7 +28,7 @@ async function autoMove(data)
 {
 	next(false);
 	if (table.current.phase == Phase.BETTING) {
-		data.box.bettingStrategy(data.rules)(data.box, data.rules);
+		data.box.bettingStrategy(data).make();
 	}
 	else if (table.current.phase == Phase.PLAYING) {
 		await autoPlay(data);
@@ -40,7 +40,7 @@ function autoStep(data)
 {
 	next(false);
 	if (table.current.phase == Phase.BETTING) {
-		data.box.bettingStrategy(data.rules)(data.box, data.rules);
+		data.box.bettingStrategy(data).make();
 		next();
 	}
 	else if (table.current.phase == Phase.PLAYING) {
@@ -142,12 +142,6 @@ const Phase = {
 	SHOWDOWN: new Box().showdown_,
 };
 
-
-const isInRange = (a, b) => x =>
-	a <= x && x <= b;
-
-const isInTolerance = (c, tolerance) =>
-	isInRange(c - tolerance, c + tolerance);
 
 
 class PlayerBox extends Box {
