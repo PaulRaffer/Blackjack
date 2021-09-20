@@ -115,7 +115,6 @@ class BettingDecision extends Decision {
 	execute()
 	{
 		this.data.box.stake = this.stake;
-		next();
 	}
 
 }
@@ -184,9 +183,8 @@ class Hit extends PlayingDecision {
 
 	execute()
 	{
-		this.data.hand.cards.push(drawAndCountCard(countingStrategies)(this.data.remainingCards));
-		if (isHandBust(this.data.hand) || isHandValue21(this.data.hand))
-			next();
+		this.data.hand.cards.push(drawAndCountCard(
+			countingStrategies)(this.data.remainingCards));
 	}
 
 }
@@ -202,7 +200,7 @@ class Stand extends PlayingDecision {
 
 	execute()
 	{
-		next();
+		this.data.hand.played = true;
 	}
 
 }
@@ -221,9 +219,9 @@ class Double extends PlayingDecision {
 	execute()
 	{
 		this.data.hand.stake *= 2;
-		this.data.hand.cards.push(
-			drawAndCountCard(countingStrategies)(this.data.remainingCards));
-		next();
+		this.data.hand.cards.push(drawAndCountCard(
+			countingStrategies)(this.data.remainingCards));
+		this.data.hand.played = true;
 	}
 	
 }
@@ -262,7 +260,7 @@ class Surrender extends PlayingDecision {
 	execute()
 	{
 		this.data.box.player.bankroll -= 0.5 * this.data.hand.stake;
-		next();
+		this.data.hand.played = true;
 	}
 
 }

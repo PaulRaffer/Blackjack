@@ -1,47 +1,20 @@
 // Copyright (c) 2021 Paul Raffer
 
 
-
-
-
-
-
-var nextFlag = false;
-
-function next(n = true)
-{
-	nextFlag = n;
-}
-
-
-
-
-
-
-
-
-
-
-
-
 async function autoMove(data)
 {
-	next(false);
 	if (table.current.phase == Phase.BETTING) {
 		data.box.bettingStrategy(data).make();
 	}
 	else if (table.current.phase == Phase.PLAYING) {
 		await autoPlay(data);
 	}
-	next();
 }
 
 function autoStep(data)
 {
-	next(false);
 	if (table.current.phase == Phase.BETTING) {
 		data.box.bettingStrategy(data).make();
-		next();
 	}
 	else if (table.current.phase == Phase.PLAYING) {
 		data.box.playingStrategy(data).make();
@@ -50,7 +23,7 @@ function autoStep(data)
 
 async function autoPlay(data)
 {
-	while (!(nextFlag || isHandValue21(data.hand))) {
+	while (!data.hand.played) {
 		await waitFor(data.box.timeouts.autoPlay);
 		data.box.playingStrategy(data).make();
 	}
@@ -59,9 +32,10 @@ async function autoPlay(data)
 async function manuPlay(data)
 {
 	enablePlayingButtons(data);
-	await waitUntil(() => nextFlag || isHandValue21(data.hand));
+	await waitUntil(() => data.hand.played);
 	disablePlayingButtons();
 }
+
 
 
 
@@ -148,19 +122,17 @@ class PlayerBox extends Box {
 
 	async bet(table)
 	{
-		next(false);
+		this.stake = 0;
 		if (this.autoBet && this.bettingStrategy) {
 			await waitFor(this.timeouts.autoBet);
-			this.bettingStrategy(
-				new BettingDecisionData(table.settings.rules, this));
+			this.bettingStrategy(new BettingDecisionData(
+				table.settings.rules, this)).make();
 		}
 		else {
 			let bettingInput = document.getElementById("betting-input");
-
 			bettingInput.classList.remove("disabled");
 			
-			await waitUntil(() => nextFlag);
-	
+			await waitUntil(() => this.stake > 0);
 			bettingInput.classList.add("disabled");
 		}
 		
@@ -194,7 +166,6 @@ class PlayerBox extends Box {
 			while (table.current.hand.cards.length < 2) {
 				new Hit(data).execute();
 			}
-			next(false);
 			
 			await (this.autoPlay && this.playingStrategy ? 
 				autoPlay : manuPlay)(data);
@@ -244,11 +215,9 @@ class DealerBox extends Box {
 		table.current.hand = table.current.box.hands[0];
 		table.current.hand.setCurrent(true);
 
-		next(false);
-		while (!nextFlag)
+		while (!table.current.hand.played)
 			table.current.box.playingStrategy(
 				table.playingDecisionData()).make();
-				next(false);
 
 		table.current.hand.setCurrent(false);
 	}

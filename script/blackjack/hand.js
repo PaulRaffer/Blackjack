@@ -77,6 +77,18 @@ class Hand {
 		this.cards = cards;
 		this.stake = stake;
 		this.resplitCount = resplitCount;
+		this.played_ = false;
+	}
+
+	get played()
+	{
+		this.played_ |= isHandBust(this) || isHandValue21(this);
+		return this.played_;
+	}
+
+	set played(p)
+	{
+		this.played_ = p;
 	}
 
 }

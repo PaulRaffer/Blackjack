@@ -5,36 +5,6 @@ const debug = false;
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 const countCard = countingStrategies => card =>
 {
 	countingStrategies.map(s => s.count(card));
@@ -146,9 +116,6 @@ function initInput(table)
 
 	let surrenderButton = document.getElementById("Surrender-button");
 	surrenderButton.onclick = () => new Surrender(data()).make();
-
-	let nextButton = document.getElementById("next-button");
-	nextButton.onclick = next;
 
 	let autoMoveButton = document.getElementById("auto-move-button");
 	autoMoveButton.onclick = () =>
