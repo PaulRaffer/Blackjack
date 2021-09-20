@@ -66,7 +66,20 @@ function autoStep(data)
 	}
 }
 
+async function autoPlay(data)
+{
+	while (!(nextFlag || isHandValue21(data.hand))) {
+		await waitFor(data.box.timeouts.autoPlay);
+		data.box.playingStrategy(data).make();
+	}
+}
 
+async function manuPlay(data)
+{
+	enablePlayingButtons(data);
+	await waitUntil(() => nextFlag || isHandValue21(data.hand));
+	disablePlayingButtons();
+}
 
 
 
@@ -107,20 +120,7 @@ function disablePlayingButtons()
 	playingInput.classList.add("disabled");
 }
 
-async function autoPlay(data)
-{
-	while (!(nextFlag || isHandValue21(data.hand))) {
-		await waitFor(data.box.timeouts.autoPlay);
-		data.box.playingStrategy(data).make();
-	}
-}
 
-async function manuPlay(data)
-{
-	enablePlayingButtons(data);
-	await waitUntil(() => nextFlag || isHandValue21(data.hand));
-	disablePlayingButtons();
-}
 
 
 

@@ -14,12 +14,6 @@ class DecisionData {
 
 class BettingDecisionData extends DecisionData {
 
-	constructor(box, stake, rules)
-	{
-		super(rules, box);
-		this.stake = stake;
-	}
-
 }
 
 
@@ -72,6 +66,12 @@ class Decision {
 
 class BettingDecision extends Decision {
 
+	constructor(stake, data)
+	{
+		super(data);
+		this.stake = stake;
+	}
+
 	phase()
 	{
 		return Phase.BETTING;
@@ -79,20 +79,21 @@ class BettingDecision extends Decision {
 
 	isLegal()
 	{
-		return this.data.stake >= this.data.rules.limits.min && this.data.stake <= this.data.rules.limits.max;
+		return this.stake >= this.data.rules.limits.min && this.stake <= this.data.rules.limits.max;
 	}
 
 	alertIllegal()
 	{
 		return alert(
 			"Illegal Betting Decision!\n\n" +
-			"Your stake: " + this.data.stake + "$\n" +
+			"Your stake: " + this.stake + "$\n" +
 			"Limits: " + this.data.rules.limits.min+"$..."+this.data.rules.limits.max+"$");
 	}
 
 	isCorrect()
 	{
-		return this.data.box.bettingStrategy ? this.data.box.bettingStrategy(this.data.box, this.data.rules) == this.data.stake : true;
+		return this.data.box.bettingStrategy ?
+			this.data.box.bettingStrategy(this.data).stake == this.stake : true;
 	}
 
 	confirmIncorrect()
@@ -101,8 +102,8 @@ class BettingDecision extends Decision {
 			"Betting Strategy Error!\n\n" +
 			
 
-			"Your stake: " + this.data.stake + "$\n" +
-			"Correct stake (" + camelCaseToNormalCase(this.data.box.bettingStrategy.name) + "): " + this.data.box.bettingStrategy(this.data.box, this.data.rules) + "\n\n" +
+			"Your stake: " + this.stake + "$\n" +
+			"Correct stake (" + camelCaseToNormalCase(this.data.box.bettingStrategy.name) + "): " + this.data.box.bettingStrategy(this.data).stake + "$\n\n" +
 			"Do you really want to continue?");
 	}
 
@@ -113,24 +114,18 @@ class BettingDecision extends Decision {
 
 	execute()
 	{
-		this.data.box.stake = this.data.stake;
+		this.data.box.stake = this.stake;
 		next();
 	}
 
 }
 
 
-function placeBet(stake) {
-	return (box, rules) => {
-		let bettingDecision = new BettingDecision(new BettingDecisionData(box, stake, rules));
-		bettingDecision.make();
-	}
-}
-
 function placeBetOnClick(box, rules)
 {
-	var stake = document.getElementById("stake").value;
-	placeBet(stake)(box, rules);
+	const stake = document.getElementById("stake").value;
+	new BettingDecision(stake,
+		new BettingDecisionData(rules, box)).make();
 }
 
 

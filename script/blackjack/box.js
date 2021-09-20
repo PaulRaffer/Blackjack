@@ -1,6 +1,83 @@
 // Copyright (c) 2021 Paul Raffer
 
 
+
+
+
+
+
+var nextFlag = false;
+
+function next(n = true)
+{
+	nextFlag = n;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+async function autoMove(data)
+{
+	next(false);
+	if (table.current.phase == Phase.BETTING) {
+		data.box.bettingStrategy(data.rules)(data.box, data.rules);
+	}
+	else if (table.current.phase == Phase.PLAYING) {
+		await autoPlay(data);
+	}
+	next();
+}
+
+function autoStep(data)
+{
+	next(false);
+	if (table.current.phase == Phase.BETTING) {
+		data.box.bettingStrategy(data.rules)(data.box, data.rules);
+		next();
+	}
+	else if (table.current.phase == Phase.PLAYING) {
+		data.box.playingStrategy(data).make();
+	}
+}
+
+async function autoPlay(data)
+{
+	while (!(nextFlag || isHandValue21(data.hand))) {
+		await waitFor(data.box.timeouts.autoPlay);
+		data.box.playingStrategy(data).make();
+	}
+}
+
+async function manuPlay(data)
+{
+	enablePlayingButtons(data);
+	await waitUntil(() => nextFlag || isHandValue21(data.hand));
+	disablePlayingButtons();
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 class Player {
 
 	constructor(bankroll)
@@ -31,7 +108,8 @@ class Box {
 	constructor(player,
 		bettingStrategy, autoBet = false, warnOnBettingError = false,
 		playingStrategy, autoPlay = false, warnOnPlayingError = false,
-		countingStrategy,
+		countingStrategy, autoCount = false, warnOnCountingError = false,
+		runningCountErrorTolerance = 0,
 		timeouts = new BoxTimeouts())
 	{
 		this.player = player;
@@ -42,8 +120,11 @@ class Box {
 		this.autoPlay = autoPlay;
 		this.warnOnPlayingError = warnOnPlayingError;
 		this.countingStrategy = countingStrategy;
+		this.autoCount = autoCount; // TODO
+		this.warnOnCountingError = warnOnCountingError;
+		this.runningCountErrorTolerance = runningCountErrorTolerance;
 		this.timeouts = timeouts;
-		this.runningCount = 0;
+		this.runningCount = this.countingStrategy && this.countingStrategy.initialRunningCount();
 		this.hands = [];
 		this.stake = 0;
 	}
@@ -62,6 +143,13 @@ const Phase = {
 };
 
 
+const isInRange = (a, b) => x =>
+	a <= x && x <= b;
+
+const isInTolerance = (c, tolerance) =>
+	isInRange(c - tolerance, c + tolerance);
+
+
 class PlayerBox extends Box {
 
 	async bet(table)
@@ -69,16 +157,23 @@ class PlayerBox extends Box {
 		next(false);
 		if (this.autoBet && this.bettingStrategy) {
 			await waitFor(this.timeouts.autoBet);
-			this.bettingStrategy(table.settings.rules)(this, table.settings.rules);
+			this.bettingStrategy
+				(table.settings.rules)(this, table.settings.rules);
 		}
 		else {
 			let bettingInput = document.getElementById("betting-input");
+
 			bettingInput.classList.remove("disabled");
 			
 			await waitUntil(() => nextFlag);
 	
 			bettingInput.classList.add("disabled");
 		}
+		
+		if (this.warnOnCountingError && !isInTolerance
+			(this.countingStrategy.runningCount, this.runningCountErrorTolerance)
+			(this.runningCount))
+			console.log("Error!");
 	}
 	
 	async deal(table)
@@ -109,7 +204,12 @@ class PlayerBox extends Box {
 			
 			await (this.autoPlay && this.playingStrategy ? 
 				autoPlay : manuPlay)(data);
-			
+
+			if (this.warnOnCountingError && !isInTolerance
+				(this.countingStrategy.runningCount, this.runningCountErrorTolerance)
+				(this.runningCount))
+				console.log("Error!");
+		
 			table.current.hand.setCurrent(false);
 		}
 	}

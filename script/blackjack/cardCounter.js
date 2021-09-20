@@ -46,9 +46,9 @@ class HiLoCountingStrategy extends CountingStrategy {
 
 class KoCountingStrategy extends CountingStrategy {
 
-	initialRunningCount()
+	initialRunningCount(rules)
 	{
-		return 4;
+		return -4;
 	}
 
 	value(card)

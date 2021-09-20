@@ -3,21 +3,21 @@
 
 function flatBettingStrategy(stake)
 {
-	function flatBettingStrategy(rules)
+	function flatBettingStrategy(data)
 	{
-		return placeBet(stake);
+		return new BettingDecision(stake, data);
 	}
 	return flatBettingStrategy;
 }
 
-function flatBettingStrategyMin(rules)
+function flatBettingStrategyMin(data)
 {
-	return flatBettingStrategy(rules.limits.min);
+	return flatBettingStrategy(data.rules.limits.min);
 }
 
-function flatBettingStrategyMax(rules)
+function flatBettingStrategyMax(data)
 {
-	return flatBettingStrategy(rules.limits.max);
+	return flatBettingStrategy(data.rules.limits.max);
 }
 
 

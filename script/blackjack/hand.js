@@ -111,7 +111,7 @@ class HandView extends View {
 				}
 				else {
 					cards.innerHTML = cardsToString(hand.cards);
-					console.log(hand.cards);
+					
 					const values = cardsValues(hand.cards);
 					valueInfo.innerText =
 						values + isValuesBust(values) ? " (Bust)" : "";
