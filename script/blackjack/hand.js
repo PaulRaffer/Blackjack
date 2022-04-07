@@ -126,7 +126,7 @@ class HandView extends View {
 					
 					const values = cardsValues(hand.cards);
 					valueInfo.innerText =
-						values + isValuesBust(values) ? " (Bust)" : "";
+						values + (isValuesBust(values) ? " (Bust)" : "");
 					
 					table.settings.view.showHandTotals ?
 						valueTr.classList.remove("display-none") :
