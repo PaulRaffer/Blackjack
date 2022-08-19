@@ -1,13 +1,21 @@
 * Blackjack
 
 © 2021 - 2022 [[https://paulraffer.github.io][Paul Raffer]].
-[[https://www.gnu.org/licenses/gpl-3.0][https://img.shields.io/badge/License-GPL%20v3-blue.svg]]
+[[https://www.gnu.org/licenses/gpl-3.0][https://img.shields.io/badge/License (>= v1.0.0)-GPLv3-blue.svg]]
+
+
+[[Contact]]
+[[Installation]]
+[[Features]]
+[[Bugs]]
+[[License]]
+[[FAQ]]
+
 
 
 ** Contact
 
-[[mailto:blackjack.i1ii1@aleeas.com][Email]]
-[[https://github.com/PaulRaffer/Blackjack/issues/new][GitHub Issues]]
+[[mailto:blackjack.i1ii1@aleeas.com][Email]] | [[https://github.com/PaulRaffer/Blackjack/issues/new][GitHub Issues]]
 
 
 
@@ -22,11 +30,9 @@ Just run it in the browser:
 
 *** [[https://paulraffer.github.io/Blackjack/android][Android App]] (v0.29.1)
 
-**** [[https://gitlab.com/RafferGames/Blackjack/android/-/releases][APK]]
-
-**** [[https://f-droid.org/en/packages/crypto.o0o0o0o0o.games.blackjack][F-Droid]]
-
-**** [[https://play.google.com/store/apps/details?id=crypto.o0o0o0o0o.games.blackjack][Google Play]]
+[[https://gitlab.com/RafferGames/Blackjack/android/-/releases][https://img.shields.io/badge/-APK-3DDC84?style=flat-square&logo=android&logoColor=black]] |
+[[https://f-droid.org/en/packages/crypto.o0o0o0o0o.games.blackjack][https://img.shields.io/badge/-F--Droid-1976D2?style=flat-square&logo=fdroid&logoColor=white]] |
+[[https://play.google.com/store/apps/details?id=crypto.o0o0o0o0o.games.blackjack][https://img.shields.io/badge/-Google Play-414141?style=flat-square&logo=googleplay&logoColor=white]]
 
 
 *** Git
@@ -66,8 +72,7 @@ or to run in a specific browser:
 + TODO Card Counting
 + TODO LibreJS Support
 
-[[https://github.com/PaulRaffer/Blackjack/issues/new?labels=enhancement][Request Feature]]
-[[mailto:blackjack.i1ii1@aleeas.com][Email]]
+[[https://github.com/PaulRaffer/Blackjack/issues/new?labels=enhancement][Request Feature]] | [[mailto:blackjack.i1ii1@aleeas.com][Email]]
 
 
 ** Bugs
@@ -77,8 +82,7 @@ or to run in a specific browser:
 + TODO Deactivate illegal hit/double button
 + TODO Can't change some rules in settings
 
-[[https://github.com/PaulRaffer/Blackjack/issues/new?labels=bug][Report Bug]]
-[[mailto:blackjack.i1ii1@aleeas.com][Email]]
+[[https://github.com/PaulRaffer/Blackjack/issues/new?labels=bug][Report Bug]] | [[mailto:blackjack.i1ii1@aleeas.com][Email]]
 
 
 ** License
@@ -93,7 +97,6 @@ Distributed under the MIT License
 
 ** FAQ
 
-[[https://github.com/PaulRaffer/Blackjack/issues/new?labels=question][I have a question.]]
-[[mailto:blackjack.i1ii1@aleeas.com][Email]]
+[[https://github.com/PaulRaffer/Blackjack/issues/new?labels=question][I have a question.]] | [[mailto:blackjack.i1ii1@aleeas.com][Email]]
 
 
