@@ -1,7 +1,7 @@
 * Blackjack
 
 © 2021 - 2022 [[https://paulraffer.github.io][Paul Raffer]].
-[[https://www.gnu.org/licenses/gpl-3.0][https://img.shields.io/badge/License (>= v1.0.0)-GPLv3-blue.svg]]
+[[https://www.gnu.org/licenses/gpl-3.0][https://img.shields.io/badge/License_(>=_v1.0.0)-GPLv3-blue.svg]]
 
 
 [[Contact]]
@@ -30,9 +30,9 @@ Just run it in the browser:
 
 *** [[https://paulraffer.github.io/Blackjack/android][Android App]] (v0.29.1)
 
-[[https://gitlab.com/RafferGames/Blackjack/android/-/releases][https://img.shields.io/badge/-APK-3DDC84?style=flat-square&logo=android&logoColor=black]] |
-[[https://f-droid.org/en/packages/crypto.o0o0o0o0o.games.blackjack][https://img.shields.io/badge/-F--Droid-1976D2?style=flat-square&logo=fdroid&logoColor=white]] |
-[[https://play.google.com/store/apps/details?id=crypto.o0o0o0o0o.games.blackjack][https://img.shields.io/badge/-Google Play-414141?style=flat-square&logo=googleplay&logoColor=white]]
+[[https://gitlab.com/RafferGames/Blackjack/android/-/releases][https://img.shields.io/badge/-APK-3DDC84.svg?style=flat-square&logo=android&logoColor=black]] |
+[[https://f-droid.org/en/packages/crypto.o0o0o0o0o.games.blackjack][https://img.shields.io/badge/-F--Droid-1976D2.svg?style=flat-square&logo=fdroid&logoColor=white]] |
+[[https://play.google.com/store/apps/details?id=crypto.o0o0o0o0o.games.blackjack][https://img.shields.io/badge/-Google Play-414141.svg?style=flat-square&logo=googleplay&logoColor=white]]
 
 
 *** Git
