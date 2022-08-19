@@ -1,0 +1,98 @@
+#+macro: GPLv3 [[https://www.gnu.org/licenses/gpl-3.0][https://img.shields.io/badge/License (>= v1.0.0)-GPL%20v3-blue.svg]]
+
+
+* Blackjack
+
+© 2021 - 2022 [[https://paulraffer.github.io][Paul Raffer]]. {{{GPLv3}}}
+
+
+** Contact
+
+[[mailto:blackjack.i1ii1@aleeas.com][Email]]
+[[https://github.com/PaulRaffer/Blackjack/issues/new][GitHub Issues]]
+
+
+
+** Installation
+
+*** [[https://paulraffer.github.io/Blackjack/][Browser]] (latest version)
+
+You don't need to install anything.
+Just run it in the browser:
+[[[[https://paulraffer.github.io/Blackjack]]]]
+
+
+*** [[https://paulraffer.github.io/Blackjack/][Android App]] (v0.29.1)
+
+**** [[https://gitlab.com/RafferGames/Blackjack/android/-/releases][APK]]
+
+**** [[https://f-droid.org/en/packages/crypto.o0o0o0o0o.games.blackjack][F-Droid]]
+
+**** [[https://play.google.com/store/apps/details?id=crypto.o0o0o0o0o.games.blackjack][Google Play]]
+
+
+*** Git
+
+**** Clone
+
+#+BEGIN_SOURCE sh
+cd <some dir>
+git clone --recurse-submodules https://github.com/PaulRaffer/Blackjack.git
+cd Blackjack
+#+END_SOURCE
+
+**** Run
+
+Run in default browser ($BROWSER):
+#+BEGIN_SOURCE sh
+. run.sh
+#+END_SOURCE
+or to run in a specific browser:
+#+BEGIN_SOURCE sh
+. run.sh <browser>
+#+END_SOURCE
+
+
+
+** Features
+
++ Play Blackjack
++ Basic Strategy
++ Strategy Error Warnings
++ Auto Play
++ TODO Deck Estimation
++ TODO Side Bets
++ TODO More Special Rules
++ TODO Logging
++ TODO Train only Pairs/Double/Soft Hands
++ TODO Card Counting
++ TODO LibreJS Support
+
+[[https://github.com/PaulRaffer/Blackjack/issues/new?labels=enhancement][Request Feature]]
+
+
+
+** Bugs
+
++ TODO Cards display as rectangles
++ TODO Can't create new players
++ TODO Deactivate illegal double button
++ TODO Can't change some rules in settings
+
+[[https://github.com/PaulRaffer/Blackjack/issues/new?labels=bug][Report Bug]]
+
+
+
+** License
+
+*** < v1.0.0
+Distributed under the MIT License.
+
+*** >= v1.0.0
+*Version 1.0.0 and later versions will be distributed under the GNU General Public License v3.0!*
+
+
+
+** FAQ
+
+[[https://github.com/PaulRaffer/Blackjack/issues/new?labels=question][I have a question.]]
