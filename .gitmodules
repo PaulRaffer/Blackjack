@@ -1,0 +1,3 @@
+[submodule "res/img/discard-tray"]
+	path = res/img/discard-tray
+	url = https://github.com/mhluska/blackjack-discard-tray-photos.git

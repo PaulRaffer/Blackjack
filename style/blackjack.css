@@ -180,6 +180,15 @@ a {
 	margin: 0.1em;
 }
 
+#discard-tray {
+	flex-shrink: 0;
+	overflow: hidden;
+}
+
+#discard-tray-photos {
+	transform: scale(2);
+}
+
 @media only screen
 	and (min-device-width: 320px)
 	and (max-device-width: 1000px) {

@@ -35,22 +35,22 @@ Just run it in the browser:
 
 **** Clone
 
-#+BEGIN_SOURCE sh
+#+BEGIN_SRC sh
 cd <some dir>
 git clone --recurse-submodules https://github.com/PaulRaffer/Blackjack.git
 cd Blackjack
-#+END_SOURCE
+#+END_SRC
 
 **** Run
 
 Run in default browser ($BROWSER):
-#+BEGIN_SOURCE sh
+#+BEGIN_SRC sh
 . run.sh
-#+END_SOURCE
+#+END_SRC
 or to run in a specific browser:
-#+BEGIN_SOURCE sh
+#+BEGIN_SRC sh
 . run.sh <browser>
-#+END_SOURCE
+#+END_SRC
 
 
 
@@ -60,7 +60,7 @@ or to run in a specific browser:
 + Basic Strategy
 + Strategy Error Warnings
 + Auto Play
-+ TODO Deck Estimation
++ Deck Estimation
 + TODO Side Bets
 + TODO More Special Rules
 + TODO Logging

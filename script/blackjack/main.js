@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Paul Raffer
+// Copyright (c) 2021 - 2022 Paul Raffer
 
 
 const debug = false;
@@ -69,12 +69,22 @@ function isCutCardReached(table)
 }
 
 
+const pad = c => l => n => String(n).padStart(l, c);
+
+
 
 async function start(table)
 {
+	let discardTrayPhotos = document.getElementById("discard-tray-photos");
+
 	for (table.current.round = 0; table.current.round < table.settings.rules.numRounds; table.current.round++) {
 		
 		console.log("roundsPerMinute: "+table.roundsPerMinute());
+
+		const cardsN = 52 * table.settings.rules.numDecks;
+		const discardedCardsN = cardsN - table.remainingCards.length;
+		const imgN = pad(0)(3)(discardedCardsN+1);
+		discardTrayPhotos.src = `res/img/discard-tray/src/${imgN}.png`;
 
 		for (table.current.phase of Object.values(Phase)) {
 			for (table.current.box of table.playerBoxes.concat([table.dealerBox])) {
@@ -205,6 +215,25 @@ function initTableSettings(table)
 			onChangeAction.oldValue != getInputValue(showAutoStepButtonInput),
 			onChangeAction);
 	}
+
+	{
+		let element = document.getElementById("discard-tray");
+		let input =
+			document.getElementsByClassName("showDiscardTray-input")[0];
+
+		let onChangeAction = () => {
+			let newValue = getInputValue(input);
+			onChangeAction.oldValue = newValue;
+			newValue ?
+				element.classList.remove("display-none") :
+				element.classList.add("display-none");
+		};
+		onChangeAction();
+		doWhen(() =>
+			onChangeAction.oldValue != getInputValue(input),
+			onChangeAction);
+	}
+
 }
 
 

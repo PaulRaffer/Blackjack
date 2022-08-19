@@ -59,12 +59,14 @@ class TableViewSettings {
 		showHandTotals = false,
 		showCurrentPlayerOnly = false,
 		showAutoMoveButton = false,
-		showAutoStepButton = false)
+		showAutoStepButton = false,
+		showDiscardTray = false)
 	{
 		this.showHandTotals = showHandTotals;
 		this.showCurrentPlayerOnly = showCurrentPlayerOnly;
 		this.showAutoMoveButton = showAutoMoveButton;
 		this.showAutoStepButton = showAutoStepButton;
+		this.showDiscardTray = showDiscardTray;
 	}
 }
 
